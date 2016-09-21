@@ -68,6 +68,7 @@ public class SceneAnalyzer {
 
 
     private void get(){
+
         //開始速度
         //開始位置
         //終了速度

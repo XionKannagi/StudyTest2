@@ -13,68 +13,87 @@ public class SceneAnalyzer {
 
     //運転の状態に応じて状態値を返すメソッド
     public int judgeStatus() {
-        if (Az < 0.4f && speed <= 1.4) {
-            return 1;//停車中が状態orブレーキ終了状態１->return 1
-        } else if (speed > 1.4 && Az < 0.4f) {
-            return 2;//走行中が状態２->return 2
+
+        //TODO 条件に不備がある？(speed > 1.4 && Az > 0.5fのときブレーキ中に走行状態と判定される)
+        if (Az > 0.6f && speed > 1.4) {
+            return 1; //ブレーキ中が状態1->開始時の加速度閾値0.6f
+        } else if (speed <= 1.4 && Az < 0.4f) {
+            return 2; //停車中が状態orブレーキ終了状態2->加速度閾値終了0.4f
         } else {
-            return 3;//ブレーキ中が状態３->return 3
+            return 3;//走行中が状態3->ある程度の速度がある時でブレーキがない時
         }
+
     }
 
-    // 2 -> 3 -> 1
+    // 2 -> 3 -> 1 ==> 1 -> 2 -> 3
 
-    private boolean inState1, inState3;
-    private float max;
+    private boolean instate1, instate2;
+    private float azMax;
+    private long azPeakTime;
 
-    public boolean mainfunc(float aX, float aY, float aZ, double v) {
+    //200ms間隔で呼び出されるメソッド
+    public boolean mainFunc(float aX, float aY, float aZ, double v) {
         Ax = aX;
         Ay = aY;
         Az = aZ;
         speed = v;
 
         result = judgeStatus();
-
+        //ブレーキ中の挙動->加速度のピークとその時の時間を記録
         if (result == 1) {
-
-            inState1 = true;
-            inState3 = false;
-
-            if (inState3 == true) {
-                //end_time = getTime();
-                return true; // 状態3 直後の 状態1
+            if (instate1 == false) {
+                //TODO ブレーキ開始時刻，位置座標，速度を記録 return true
+                // 初めて3-> 1変わった．
+                return true;
             }
+            instate1 = true;
+            instate2 = false;
+
+            if (azMax < Az) {
+                //ピーク時の時刻も記録
+                azMax = Az;
+                azPeakTime = System.currentTimeMillis();
+            }
+
+            return false;
 
         } else if (result == 2) {
-
-            inState1 = false;
-            inState3 = false;
+            if (instate1 == true) {
+                return true; // 状態1 直後の 状態2
+            }
+            instate1 = false;
+            instate2 = true;
+            return false;
 
         } else {
-            //TODO ブレーキ中の挙動->加速度のピークとその時の時間を
-            if (inState3 == false) {
-                //start_time = getTime(); // 初めての状態3
-            }
-
-            inState1 = false;
-            inState3 = true;
-
-            if (max < Az) {
-                max = Az;
-            }
+            instate1 = false;
+            instate2 = false;
+            return false;
         }
-        return false;
     }
 
+    //各getterの記述(速度，位置座標に関してはDriveActivity側での取得がいいかも？)
 
-    private void get(){
-
+    public double getSpeed() {
         //開始速度
-        //開始位置
         //終了速度
-        //終了位置
-        //ピーク値
-        //ピーク時刻
+        return speed;
     }
+
+    //開始位置
+    //終了位置
+
+    //加速度のピーク値
+    public float getAzMax() {
+        //ピーク値
+        return azMax;
+    }
+
+    //加速度ピーク時の時刻
+    public long getPeakTime() {
+        //ピーク時刻
+        return azPeakTime;
+    }
+
 
 }

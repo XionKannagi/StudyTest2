@@ -25,6 +25,16 @@ public class DriveActivity extends Activity {
     private DataLogger DL;
     private SceneAnalyzer mSA;
     private String driverName;
+    private double startSpeed;
+    private double endSpeed;
+    private double startLatitude;
+    private double startLongitude;
+    private double endLatitude;
+    private double endLongitude;
+    private float azMax;
+    private long startTime;
+    private long azPeakTime;
+    private int stateCount = 0;//ブレーキ区間の判別に使用0 -> 開始/1 -> 終了
 
     java.text.DateFormat df;
     private float A[] = new float[3];
@@ -88,7 +98,29 @@ public class DriveActivity extends Activity {
                 public void run() {
 
                     infoUpdate(); //<- 情報を更新してみる
-                    infoSave(); //<- Logをとってみる
+                    if(mSA.mainFunc(A[0],A[1],A[3],GPS.Inst().getSpeed())){
+                        if (stateCount == 0){
+                            //TODO ブレーキ開始時の情報を記録
+                            startLatitude = GPS.Inst().getLatitude();
+                            startLongitude = GPS.Inst().getLongitude();
+                            startSpeed = GPS.Inst().getSpeed();
+                            startTime = System.currentTimeMillis();
+                            stateCount = 1;
+                        } else {
+                            //TODO ブレーキ終了時の情報を記録し理想値と比較，教示
+                            endLatitude = GPS.Inst().getLatitude();
+                            endLongitude = GPS.Inst().getLongitude();
+                            endSpeed = GPS.Inst().getSpeed();
+                            azMax = mSA.getAzMax();
+                            azPeakTime = mSA.getPeakTime();
+                            //TODO 比較と教示結果を返すメソッドに上の情報を投げる
+
+                            stateCount = 0;
+                        }
+                    }
+                    //TODO Loggerのテストも忘れずに！
+                    //infoSave(); //<- Logをとってみる
+
                     mHandler.postDelayed(this, 200); //<- 0.2sごとに情報更新
                 }
             }, 200);
@@ -98,10 +130,18 @@ public class DriveActivity extends Activity {
         }
     }
 
-    public void goBack(View v) {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+    //TODO 比較と教示結果を返すメソッドを作る．
+    public void valuesCompare(){
+
     }
+
+    //TODO 理想値を算出するメソッド．
+    public long calcIdealTime(){
+
+        return 0;
+    }
+
+
 
     public void infoUpdate() {
 
@@ -121,6 +161,11 @@ public class DriveActivity extends Activity {
         //計測データの記録
         //DL.saveLog(df.format(new Date()), A[0], A[1], A[2], GPS.Inst().getSpeed(), mSA.judgeStatus(), 0f, 0f);->一時凍結
         DL.saveLog(df.format(new Date()), A[0], A[1], A[2], GPS.Inst().getSpeed(), 0, 0f, 0f);//記録テスト
+    }
+
+    public void goBack(View v) {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     @Override

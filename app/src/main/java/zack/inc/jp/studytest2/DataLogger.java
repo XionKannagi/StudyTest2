@@ -14,7 +14,8 @@ import java.io.PrintWriter;
  */
 
 //TODO CSV ファイル書き込み部分の作成->ファイル名はTime+Driver_Nameで書き込む
-//TODO InputStream では，try{}catch{}finally{is.close;}までを忘れずに！！
+//TODO 書き込めてないかも．パスが必要?
+
 public class DataLogger {
 
     private String driverName;
@@ -31,14 +32,12 @@ public class DataLogger {
     }
 
 
-
-    public void saveLog(String date, float Ax, float Ay, float Az, double speed, int status, float amTime, float arTime) {
+    public void saveLog(String date, float Ax, float Ay, float Az, double latitude, double longitude, double speed) {
         FileOutputStream fos;
         PrintWriter pw = null;
-
         try {
 
-            fos = appContext.openFileOutput(saveTime + driverName + ".csv", Context.MODE_PRIVATE | Context.MODE_APPEND);
+            fos = appContext.openFileOutput(saveTime + driverName + ".csv", Context.MODE_WORLD_READABLE | Context.MODE_APPEND);
             pw = new PrintWriter(fos);
             StringBuilder sb = new StringBuilder();
             //Logに必要なデータを詰めていく
@@ -50,13 +49,11 @@ public class DataLogger {
             sb.append(",");
             sb.append(Az);
             sb.append(",");
+            sb.append(longitude);
+            sb.append(",");
+            sb.append(latitude);
+            sb.append(",");
             sb.append(speed);
-            sb.append(",");
-            sb.append(status);
-            sb.append(",");
-            sb.append(amTime);
-            sb.append(",");
-            sb.append(arTime);
             sb.append("¥n");
             pw.println(sb.toString());
             pw.flush();

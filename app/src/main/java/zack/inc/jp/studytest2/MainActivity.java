@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -31,12 +32,14 @@ public class MainActivity extends Activity {
         SpannableStringBuilder sp = (SpannableStringBuilder)editText.getText();
         driverName = sp.toString();
 
-        Intent intent = new Intent(this, DriveActivity.class);
-        if (driverName != null) {
+
+        if (driverName.length() != 0) {
+            Intent intent = new Intent(this, DriveActivity.class);
             intent.putExtra("DRIVER_NAME", driverName);
             startActivity(intent);
         } else {
-            //TODO Toastの実装
+
+            Toast.makeText(this, "運転手の名前を入力して下さい", Toast.LENGTH_LONG).show();
 
 
         }

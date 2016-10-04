@@ -37,10 +37,11 @@ public class GPS implements LocationListener {
 
         location = locman.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-        gpsSpeed = location.getSpeed();
+        if (location != null) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            gpsSpeed = location.getSpeed();
+        }
 
 
         /*
@@ -78,6 +79,7 @@ public class GPS implements LocationListener {
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         gpsSpeed = location.getSpeed();
+        this.location = location;
         Log.v("----------", "----------");
         Log.v("Latitude", String.valueOf(location.getLatitude()));
         Log.v("Longitude", String.valueOf(location.getLongitude()));
@@ -89,6 +91,8 @@ public class GPS implements LocationListener {
     public double getLongitude() {return longitude;}
 
     public double getSpeed() {return gpsSpeed;}
+
+    public Location getLocation() {return location;}
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {

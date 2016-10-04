@@ -71,7 +71,7 @@ public class Accelerometer implements SensorEventListener {
             _z = event.values[SensorManager.DATA_Z];
             */
 
-            Log.d(TAG, "Call Sensor Changed");
+            //Log.d(TAG, "Call Sensor Changed");
             p = getArrayIndex(p + 1);
             x[p] = event.values[SensorManager.DATA_X]; // X軸
             y[p] = event.values[SensorManager.DATA_Y]; // Y軸

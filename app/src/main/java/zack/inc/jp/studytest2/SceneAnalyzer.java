@@ -42,8 +42,10 @@ public class SceneAnalyzer {
                 if (speed < 4.0) state = 0;
                 else if (Az < 0.4) state = 1;
                 return 1;
+            default:
+                return -1; //判定不能エラーコード-1
         }
-        return 0;//判定不能
+
     }
 
     // 2 -> 3 -> 1 ==> 1 -> 2 -> 3
@@ -102,8 +104,6 @@ public class SceneAnalyzer {
         return speed;
     }
 
-    //開始位置
-    //終了位置
 
     //加速度のピーク値
     public float getAzMax() {

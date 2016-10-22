@@ -1,5 +1,6 @@
 package zack.inc.jp.studytest2;
 
+import android.content.Context;
 import android.location.Location;
 
 /**
@@ -12,6 +13,17 @@ public class Calclater {
     private double p = 2.367;
     private double finTime;
     private double peakTime;
+    private Context appContext;
+    private static int BRAKE_PATTERN_FRONT_PEAK = 1;
+    private static int BREAK_PATTERN_BACK_PEAK = 2;
+    private static int BRAKE_PATTERN_SUDDEN = 3;// 急ブレーキ
+    private static int BREAK_PATTERN_GOOD = 4;
+    private double timeRange = 0.5; //理想的なプレーキ時間±0.5sの範囲はgoodブレーキ
+
+
+    public Calclater(Context context) {
+        this.appContext = context;
+    }
 
 
     //理想値を算出するメソッド．
@@ -45,6 +57,36 @@ public class Calclater {
 
         return results[0];
     }
+
+
+    //Teachメソッドに渡すためのケース分け
+    public void caseSeparator(double initSpeed, double endSpeed, float distance, long peakTime, float azMax) {
+
+        double[] idealPeakTimeResult;
+        TeachResult teachResult = new TeachResult(appContext);
+
+        idealPeakTimeResult = getIdealPeakTime(initSpeed, endSpeed, distance);
+
+
+        //教示用のメソッドに投げる
+        if (azMax > 2.94) {
+
+            teachResult.teaching(BRAKE_PATTERN_SUDDEN);//加速度のピークが2.94を超えていたら急ブレーキ
+
+        } else if ((idealPeakTimeResult[0] - timeRange) > ((double) peakTime) / 1000) {//理想よりも手前ピークのとき
+
+            teachResult.teaching(BRAKE_PATTERN_FRONT_PEAK);
+
+        } else if ((idealPeakTimeResult[0] + timeRange) < ((double) peakTime) / 1000) {//理想よりも奥ピークのとき
+
+            teachResult.teaching(BREAK_PATTERN_BACK_PEAK);
+
+        } else { //それ以外はおそらく良いブレーキ
+
+            teachResult.teaching(BREAK_PATTERN_GOOD);
+        }
+    }
+
 }
 
 

@@ -33,10 +33,13 @@ public class GPS implements LocationListener {
         //stored_location[p] = new Location(LocationManager.GPS_PROVIDER);
 
 
+
         locman = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
 
         location = locman.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
+
+        //TODO 初期値に前回のデータが残っている
         if (location != null) {
             latitude = location.getLatitude();
             longitude = location.getLongitude();

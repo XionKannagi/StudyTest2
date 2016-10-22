@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,7 +33,7 @@ public class DriveActivity extends Activity {
     private double endSpeed;
     private Location mlcation;
     private double mLatitude;
-    private double mLongittude;
+    private double mLongitude;
     private double mSpeed;
     private double startLatitude;
     private double startLongitude;
@@ -65,8 +66,8 @@ public class DriveActivity extends Activity {
 
 
         mSA = new SceneAnalyzer();
-        mCalc = new Calclater();
-        DL = new DataLogger(getApplicationContext(), df.format(new Date()), driverName);
+        mCalc = new Calclater(this);
+        DL = new DataLogger(this, System.currentTimeMillis(), df.format(new Date()), driverName);
 
         //
         speedText = (TextView) findViewById(R.id.speedText);
@@ -79,6 +80,7 @@ public class DriveActivity extends Activity {
         driverNameText = (TextView) findViewById(R.id.textView2);
 
         driverNameText.setText(driverName);
+        infoUpdate();
 
     }
 
@@ -100,7 +102,6 @@ public class DriveActivity extends Activity {
     }
 
     float dist;
-    double[] result = new double[2];
 
     public void start(View v) {
         if (buttonFlag) {
@@ -111,35 +112,14 @@ public class DriveActivity extends Activity {
                     @Override
                     public void run() {
                         infoUpdate(); //<- 情報を更新してみる
-                        //TODO Loggerのテストも忘れずに！
-                        //infoSave(); //<- Logをとってみる
-
-                        /*
-                        if (mSA.mainFunc(A[0], A[1], A[3], GPS.Inst().getSpeed())) {
-                            if (stateCount == 0) {
-                                setStartInfo();
-                                stateCount = 1;
-                            } else {
-                                setEndInfo();
-                                //TODO 理想のピーク時刻を取得するメソッドに，上の情報を投げる
-                                result = mCalc.getIdealPeakTime(startSpeed, endSpeed, dist);
-                                //TODO 教示用のメソッドに投げる．
-
-
-                                stateCount = 0;
-                            }
-                        }
-
-                        if (stateCount == 1) {
-                            dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
-                        } else {
-                            dist = 0;
-                        }
-                        */
-
+                        infoSave(); //<- Log記録
+                        //judge(); //<-こいつを動かすと判定＋教示がされる
                         mHandler.postDelayed(this, 200); //<- 0.2sごとに情報更新
                     }
                 }, 200);
+            } else {
+                Log.d("GPS", "Location not found");
+                Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
             }
         } else {
             buttonFlag = true;
@@ -147,15 +127,12 @@ public class DriveActivity extends Activity {
         }
     }
 
-    //TODO 比較と教示結果を返すメソッドを作る．
-    public void valuesCompare() {
-
-    }
 
     Location oldLocation;
 
     public void infoUpdate() {
 
+        //加速度センサー
         A = Accelerometer.Inst().getValueAverageFromLast();
         xAccelText.setText("X:" + String.valueOf(A[0]));
         yAccelText.setText("y:" + String.valueOf(A[1]));
@@ -166,35 +143,60 @@ public class DriveActivity extends Activity {
         oldLocation = mlcation;
         mlcation = GPS.Inst().getLocation();
         mLatitude = mlcation.getLatitude();
-        mLongittude = mlcation.getLongitude();
+        mLongitude = mlcation.getLongitude();
         mSpeed = mlcation.getSpeed();
         latitudeText.setText(String.valueOf(mLatitude));
-        longitudeText.setText(String.valueOf(mLongittude));
+        longitudeText.setText(String.valueOf(mLongitude));
         speedText.setText(String.valueOf(mSpeed));
 
 
     }
 
+    //TODO 計測モードと計測＆システムモードを作る．
+
 
     public void setStartInfo() {
-        //TODO 移動距離は累積にする
         startSpeed = mSpeed;
         startTime = System.currentTimeMillis();
     }
 
     public void setEndInfo() {
-        //TODO ブレーキ終了時の情報を記録し理想値と比較，教示
         endSpeed = mSpeed;
         azMax = mSA.getAzMax();
-        azPeakTime = mSA.getPeakTime();
+        azPeakTime = mSA.getPeakTime() - startTime; // msで取得されている
 
 
     }
 
     public void infoSave() {
         //計測データの記録
-        Log.d("information","saved");
-        DL.saveLog(df.format(new Date()), A[0], A[1], A[2], mLatitude, mLongittude, mSpeed);//記録テスト
+        Log.d("information", "saved");
+        DL.saveLog(System.currentTimeMillis(), A[0], A[1], A[2], mLatitude, mLongitude, mSpeed);//記録テスト
+    }
+
+
+    //TODO 見て欲しいのは判定メソッドの動き
+    public void judge() {
+        if (mSA.mainFunc(A[0], A[1], A[3], GPS.Inst().getSpeed())) {
+            if (stateCount == 0) {
+                setStartInfo();
+                stateCount = 1;
+            } else {
+                setEndInfo();
+                //理想のピーク時刻を取得するメソッドに，上の情報を投げる
+                mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, azMax);
+
+                stateCount = 0;
+            }
+        }
+
+        if (stateCount == 1) {
+            dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
+        } else {
+            dist = 0;
+        }
+
+
     }
 
     public void goBack(View v) {

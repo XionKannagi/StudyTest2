@@ -18,7 +18,7 @@ public class Calclater {
     private static int BREAK_PATTERN_BACK_PEAK = 2;
     private static int BRAKE_PATTERN_SUDDEN = 3;// 急ブレーキ
     private static int BREAK_PATTERN_GOOD = 4;
-    private double timeRange = 0.5; //理想的なプレーキ時間±0.5sの範囲はgoodブレーキ
+    private double timeRange = 0.2; //理想的なプレーキ時間±0.2sの範囲はgoodブレーキ
 
 
     public Calclater(Context context) {
@@ -35,7 +35,7 @@ public class Calclater {
         finTime = ((2 * (6 - Math.sqrt(6))) * distance) / (3 * (endSpeed - initSpeed));
 
         //理想的な減速終了時間を用いた減速度最大時刻
-        peakTime = ((8 * p - (15 * Math.sqrt(14 * p * p - 75 * p - 75))) / (15 * (p - 2))) * finTime;
+        peakTime = ((8 * p - (15 - Math.sqrt(19 * p * p - 75 * p + 75))) / (15 * (p - 2))) * finTime;
 
         results[0] = peakTime;
         results[1] = finTime;

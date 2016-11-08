@@ -27,19 +27,18 @@ public class SceneAnalyzer {
         */
 
         //シーン判定改良版
+        //TODO 閾値の部分の調整 -> 速度&加速度での閾値を見るべきかもしてない
         switch (state) {
             case 0://STOP
                 if (speed > 5.0) state = 1;
                 else if (Az > 0.5) state = 2;
                 return 2;
             case 1://CRUISE
-                if (speed < 4.0) state = 0;
-                else if (Az > 0.5) {
-                    state = 2;
-                }
+                if (speed < 0.0) state = 0;
+                else if (Az > 0.5) state = 2;
                 return 3;
             case 2://BRAKE
-                if (speed < 4.0) state = 0;
+                if (speed < 0.0) state = 0;
                 else if (Az < 0.4) state = 1;
                 return 1;
             default:
@@ -86,18 +85,20 @@ public class SceneAnalyzer {
                 instate2 = true;
                 return true; // 状態1 直後の 状態2
             }
-
             return false;
 
-        } else {
+        } else if(result == 3) {
             instate1 = false;
             instate2 = false;
             return false;
+        } else {
+            //エラーコード-1が返ってきたときの処理
+            return false;//一応何もして欲しくないから
         }
     }
 
-    //各getterの記述(速度，位置座標に関してはDriveActivity側での取得がいいかも？)
 
+    //各getterの記述(速度，位置座標に関してはDriveActivity側での取得がいいかも？)
     public double getSpeed() {
         //開始速度
         //終了速度

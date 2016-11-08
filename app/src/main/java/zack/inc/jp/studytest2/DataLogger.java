@@ -19,24 +19,29 @@ import java.util.TimeZone;
  * Created by togane on 2016/09/14.
  */
 
-//TODO 計測モードで使われたのか，システムモードで使われたのかも目印をつける
+
 
 public class DataLogger {
 
-    java.text.DateFormat df;
     private String driverName;
     private String saveTime;
     private long initTime;
     private Context appContext;
-    private boolean usedSysFlag;
+    private String sysMode;
 
 
-    public DataLogger(Context context, long initTime, String timeStamp, String driverName) {
+    public DataLogger(Context context, long initTime, String timeStamp, String driverName, boolean modeFlag) {
 
         this.driverName = driverName;
         this.initTime = initTime;
         this.saveTime = timeStamp;
         this.appContext = context;
+
+        if(modeFlag){
+            this.sysMode = "_on";//教示モードのとき
+        } else {
+            this.sysMode = "_off";//計測モードのとき
+        }
 
     }
 
@@ -45,10 +50,8 @@ public class DataLogger {
         FileOutputStream fos;
         BufferedWriter bw = null;
         String exPathStr = appContext.getExternalFilesDir(null).getPath();// /root/sdcard/Android/data/package_name/filesを取得
-
         try {
-            //fos = appContext.openFileOutput(saveTime + driverName + ".csv", Context.MODE_PRIVATE | Context.MODE_APPEND);
-            fos = new FileOutputStream(exPathStr + "/" + saveTime + "_" + driverName + ".csv", true);// /root/sdcard/Android/data/package_name/files/直下に記録
+            fos = new FileOutputStream(exPathStr + "/" + saveTime + "_" + driverName + sysMode + ".csv", true);// /root/sdcard/Android/data/package_name/files/直下に記録
             bw = new BufferedWriter(new OutputStreamWriter(fos));
             StringBuilder sb = new StringBuilder();
             //Logに必要なデータを詰めていく

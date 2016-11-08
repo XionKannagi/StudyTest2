@@ -114,23 +114,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="64dp"
         android:onClick="start"
         android:text="Start"
-        android:id="@+id/button3"
+        android:id="@+id/str_stp_Button"
+        android:layout_marginTop="37dp"
         android:layout_below="@+id/linearLayout"
-        android:layout_alignLeft="@+id/button2"
-        android:layout_alignStart="@+id/button2" />
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Back"
         android:id="@+id/button2"
-        android:layout_below="@+id/button3"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="55dp"
-        android:onClick="goBack" />
+
+        android:onClick="goBack"
+        android:layout_alignTop="@+id/str_stp_Button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="45dp"
+        android:layout_marginStart="45dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -139,5 +141,28 @@
         android:id="@+id/textView2"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/switch1"
+        android:layout_marginRight="37dp"
+        android:layout_marginEnd="37dp"
+        android:layout_alignTop="@+id/str_stp_Button"
+        android:layout_alignRight="@+id/linearLayout"
+        android:layout_alignEnd="@+id/linearLayout"
+        android:layout_alignBottom="@+id/str_stp_Button"
+        android:onClick="onSwitchCheck" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Teaching mode"
+        android:id="@+id/textView3"
+        android:singleLine="false"
+        android:layout_alignTop="@+id/switch1"
+        android:layout_toStartOf="@+id/switch1"
+        android:layout_alignBottom="@+id/switch1"
+        android:gravity="center_vertical" />
 
 </RelativeLayout>

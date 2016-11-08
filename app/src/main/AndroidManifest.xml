@@ -19,7 +19,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DriveActivity">
+        <activity
+            android:name=".DriveActivity"
+            android:screenOrientation="landscape">
         </activity>
     </application>
 

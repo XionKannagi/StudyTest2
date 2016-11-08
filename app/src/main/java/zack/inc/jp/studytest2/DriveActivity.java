@@ -1,14 +1,20 @@
 package zack.inc.jp.studytest2;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Handler;;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,6 +31,9 @@ public class DriveActivity extends Activity {
     TextView latitudeText;
     TextView longitudeText;
     TextView driverNameText;
+    Button strStpButton;
+    Switch modeSwitch;
+    ActionBar mActionBar;
     private DataLogger DL;
     private SceneAnalyzer mSA;
     private Calclater mCalc;
@@ -47,6 +56,7 @@ public class DriveActivity extends Activity {
     java.text.DateFormat df;
     private float A[] = new float[3];
     private boolean buttonFlag = true;
+    private boolean modeFlag; //教示モード <-> 計測モード 切り替えよう
     private Handler mHandler = new Handler();
 
 
@@ -67,7 +77,7 @@ public class DriveActivity extends Activity {
 
         mSA = new SceneAnalyzer();
         mCalc = new Calclater(this);
-        DL = new DataLogger(this, System.currentTimeMillis(), df.format(new Date()), driverName);
+
 
         //
         speedText = (TextView) findViewById(R.id.speedText);
@@ -79,9 +89,14 @@ public class DriveActivity extends Activity {
         longitudeText = (TextView) findViewById(R.id.longitude);
         driverNameText = (TextView) findViewById(R.id.textView2);
 
+        strStpButton = (Button)findViewById(R.id.str_stp_Button);
+
+        mActionBar = getActionBar();
+        mActionBar.setTitle("Measuring");
+
         driverNameText.setText(driverName);
         infoUpdate();
-
+        
     }
 
 
@@ -106,14 +121,19 @@ public class DriveActivity extends Activity {
     public void start(View v) {
         if (buttonFlag) {
             buttonFlag = false;
+            strStpButton.setText("Stop!");
             if (GPS.Inst().getLocation() != null) {
+                DL = new DataLogger(this, System.currentTimeMillis(), df.format(new Date()), driverName, modeFlag);
                 Log.d("Timer:", "Start");
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        infoUpdate(); //<- 情報を更新してみる
-                        infoSave(); //<- Log記録
+                        //handlerの関係で，この中での処理は避けるべき．
+
+                        infoUpdate(); //<- 情報を更新
+                        infoSave(); //<- 情報をLogに記録
                         //judge(); //<-こいつを動かすと判定＋教示がされる
+
                         mHandler.postDelayed(this, 200); //<- 0.2sごとに情報更新
                     }
                 }, 200);
@@ -123,6 +143,7 @@ public class DriveActivity extends Activity {
             }
         } else {
             buttonFlag = true;
+            strStpButton.setText("Start");
             mHandler.removeCallbacksAndMessages(null);
         }
     }
@@ -152,8 +173,6 @@ public class DriveActivity extends Activity {
 
     }
 
-    //TODO 計測モードと計測＆システムモードを作る．
-
 
     public void setStartInfo() {
         startSpeed = mSpeed;
@@ -163,6 +182,7 @@ public class DriveActivity extends Activity {
     public void setEndInfo() {
         endSpeed = mSpeed;
         azMax = mSA.getAzMax();
+        //TODO もしかすると，Calclaterクラスで計算させたほうがいいかもしれない．
         azPeakTime = mSA.getPeakTime() - startTime; // msで取得されている
 
 
@@ -177,31 +197,57 @@ public class DriveActivity extends Activity {
 
     //TODO 見て欲しいのは判定メソッドの動き
     public void judge() {
-        if (mSA.mainFunc(A[0], A[1], A[3], GPS.Inst().getSpeed())) {
-            if (stateCount == 0) {
-                setStartInfo();
-                stateCount = 1;
-            } else {
-                setEndInfo();
-                //理想のピーク時刻を取得するメソッドに，上の情報を投げる
-                mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, azMax);
 
-                stateCount = 0;
+        if(modeFlag) {
+            if (mSA.mainFunc(A[0], A[1], A[3], GPS.Inst().getSpeed())) {
+                if (stateCount == 0) {
+                    setStartInfo();
+                    stateCount = 1;
+                } else {
+                    setEndInfo();
+                    //理想のピーク時刻を取得するメソッドに，上の情報を投げる
+                    mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, azMax);
+
+                    stateCount = 0;
+                }
             }
-        }
 
-        if (stateCount == 1) {
-            dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
+            if (stateCount == 1) {
+                dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
+            } else {
+                dist = 0;
+            }
+
         } else {
-            dist = 0;
+            //なにもしない
         }
 
 
     }
 
+
     public void goBack(View v) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+    }
+
+    //Switchによるモード変更
+    public void onSwitchCheck(View view) {
+        modeSwitch = (Switch) view;
+
+        if (modeSwitch.isChecked()) {
+
+            mActionBar.setTitle("Teaching");
+            mActionBar.setBackgroundDrawable(getApplicationContext().getResources().getDrawable(R.color.teachModeColorPrimary));
+            modeFlag = true; //教示モードのとき
+
+        } else {
+
+            mActionBar.setTitle("Measuring");
+            mActionBar.setBackgroundDrawable(getApplicationContext().getResources().getDrawable(R.color.background_material_dark));
+            modeFlag = false;//計測モードのみのとき
+        }
+
     }
 
     @Override

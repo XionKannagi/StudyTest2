@@ -131,8 +131,8 @@ public class DriveActivity extends Activity {
                         //handlerの関係で，この中での処理は避けるべき．
 
                         infoUpdate(); //<- 情報を更新
-                        infoSave(); //<- 情報をLogに記録
-                        //judge(); //<-こいつを動かすと判定＋教示がされる
+                        //infoSave(); //<- 情報をLogに記録
+                        judge(); //<-こいつを動かすと判定＋教示がされる
 
                         mHandler.postDelayed(this, 200); //<- 0.2sごとに情報更新
                     }
@@ -151,6 +151,7 @@ public class DriveActivity extends Activity {
 
     Location oldLocation;
 
+    //情報の更新
     public void infoUpdate() {
 
         //加速度センサー
@@ -188,9 +189,8 @@ public class DriveActivity extends Activity {
 
     }
 
+    //計測データの記録
     public void infoSave() {
-        //計測データの記録
-        Log.d("information", "saved");
         DL.saveLog(System.currentTimeMillis(), A[0], A[1], A[2], mLatitude, mLongitude, mSpeed);//記録テスト
     }
 
@@ -198,21 +198,25 @@ public class DriveActivity extends Activity {
     //TODO 見て欲しいのは判定メソッドの動き
     public void judge() {
 
+        int flag; //何から何に状態が変わったか入れとく
         if(modeFlag) {
-            if (mSA.mainFunc(A[0], A[1], A[3], GPS.Inst().getSpeed())) {
-                if (stateCount == 0) {
+            //if (mSA.mainFunc(A[0], A[1], A[2], GPS.Inst().getSpeed())) {
+            flag = mSA.mainFunc(A[0], A[1], A[2], GPS.Inst().getSpeed());
+                if (flag == 1) {
+                    Log.v("judge","ブレーキ始め");
                     setStartInfo();
                     stateCount = 1;
-                } else {
+                } else if(flag == 2) {
+                    Log.v("judge","ブレーキ終わり");
                     setEndInfo();
                     //理想のピーク時刻を取得するメソッドに，上の情報を投げる
                     mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, azMax);
 
                     stateCount = 0;
                 }
-            }
+            //}
 
-            if (stateCount == 1) {
+            if (flag == 1) {
                 dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
             } else {
                 dist = 0;
@@ -220,6 +224,7 @@ public class DriveActivity extends Activity {
 
         } else {
             //なにもしない
+
         }
 
 

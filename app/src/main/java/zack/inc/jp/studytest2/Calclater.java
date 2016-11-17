@@ -35,7 +35,7 @@ public class Calclater {
         finTime = ((2 * (6 - Math.sqrt(6))) * distance) / (3 * (endSpeed - initSpeed));
 
         //理想的な減速終了時間を用いた減速度最大時刻
-        peakTime = ((8 * p - (15 - Math.sqrt(19 * p * p - 75 * p + 75))) / (15 * (p - 2))) * finTime;
+        peakTime = (8 * p - (15 - Math.sqrt(19 * p * p - 75 * p + 75))) * finTime / (15 * (p - 2));
 
         results[0] = peakTime;
         results[1] = finTime;
@@ -84,6 +84,7 @@ public class Calclater {
         } else { //それ以外はおそらく良いブレーキ
 
             teachResult.teaching(BREAK_PATTERN_GOOD);
+
         }
     }
 

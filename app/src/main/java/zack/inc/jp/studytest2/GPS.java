@@ -83,9 +83,12 @@ public class GPS implements LocationListener {
         longitude = location.getLongitude();
         gpsSpeed = location.getSpeed();
         this.location = location;
-        Log.v("----------", "----------");
-        Log.v("Latitude", String.valueOf(location.getLatitude()));
-        Log.v("Longitude", String.valueOf(location.getLongitude()));
+        //Log.v("----------", "----------");
+        //Log.v("Latitude", String.valueOf(location.getLatitude()));
+        //Log.v("Longitude", String.valueOf(location.getLongitude()));
+        if(location.getSpeed()==0){
+            Log.v("speed", String.valueOf(location.getSpeed()));
+        }
 
     }
 
@@ -101,13 +104,13 @@ public class GPS implements LocationListener {
     public void onStatusChanged(String provider, int status, Bundle extras) {
         switch (status) {
             case LocationProvider.AVAILABLE:
-                Log.v("Status", "AVAILABLE");
+                //Log.v("Status", "AVAILABLE");
                 break;
             case LocationProvider.OUT_OF_SERVICE:
-                Log.v("Status", "OUT_OF_SERVICE");
+                //Log.v("Status", "OUT_OF_SERVICE");
                 break;
             case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                Log.v("Status", "TEMPORARILY_UNAVAILABLE");
+                //Log.v("Status", "TEMPORARILY_UNAVAILABLE");
                 break;
         }
     }

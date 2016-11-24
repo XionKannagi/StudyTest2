@@ -20,16 +20,22 @@ public class TeachResult {
         // switch分による教示分け
         switch (pattern){
             case 1:
-                Toast.makeText(context,"BRAKE_PATTERN_FRONT_PEAK",Toast.LENGTH_LONG).show();
+                Toast.makeText(context,"踏み始めを緩やかにしましょう！ ",Toast.LENGTH_LONG).show();
                 break;
             case 2:
-                Toast.makeText(context,"BREAK_PATTERN_BACK_PEAK",Toast.LENGTH_LONG).show();
+                Toast.makeText(context,"おしい！踏み始めをもう少し緩やかにしましょう！",Toast.LENGTH_LONG).show();
                 break;
             case 3:
-                Toast.makeText(context,"BRAKE_PATTERN_SUDDEN",Toast.LENGTH_LONG).show();
+                Toast.makeText(context,"踏み始めを強めにしましょう！",Toast.LENGTH_LONG).show();
                 break;
             case 4:
-                Toast.makeText(context,"BREAK_PATTERN_GOOD",Toast.LENGTH_LONG).show();
+                Toast.makeText(context,"あとちょっと！踏み始めをもう少し強めにしましょう！",Toast.LENGTH_LONG).show();
+                break;
+            case 5:
+                Toast.makeText(context,"急ブレーキです！気をつけてください！",Toast.LENGTH_LONG).show();
+                break;
+            case 6:
+                Toast.makeText(context,"いいですね！理想的です！",Toast.LENGTH_LONG).show();
                 break;
             default:
                 break;

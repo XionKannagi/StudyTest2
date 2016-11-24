@@ -41,6 +41,7 @@ public class DriveActivity extends Activity {
     private double startSpeed;
     private double endSpeed;
     private Location mlcation;
+    Location oldLocation;
     private double mLatitude;
     private double mLongitude;
     private double mSpeed;
@@ -51,6 +52,7 @@ public class DriveActivity extends Activity {
     private float azMax;
     private long startTime;
     private long azPeakTime;
+    private long finTime;
     private int stateCount = 0;//ブレーキ区間の判別に使用0 -> 開始/1 -> 終了
 
     java.text.DateFormat df;
@@ -89,14 +91,14 @@ public class DriveActivity extends Activity {
         longitudeText = (TextView) findViewById(R.id.longitude);
         driverNameText = (TextView) findViewById(R.id.textView2);
 
-        strStpButton = (Button)findViewById(R.id.str_stp_Button);
+        strStpButton = (Button) findViewById(R.id.str_stp_Button);
 
         mActionBar = getActionBar();
         mActionBar.setTitle("Measuring");
 
         driverNameText.setText(driverName);
         infoUpdate();
-        
+
     }
 
 
@@ -129,14 +131,13 @@ public class DriveActivity extends Activity {
                     @Override
                     public void run() {
                         //handlerの関係で，この中での処理は避けるべき．
-
                         infoUpdate(); //<- 情報を更新
                         //infoSave(); //<- 情報をLogに記録
                         judge(); //<-こいつを動かすと判定＋教示がされる
-
-                        mHandler.postDelayed(this, 200); //<- 0.2sごとに情報更新
+                        //TODO 更新，sampling を 25,50,100msに変更してみる
+                        //mHandler.postDelayed(this, 200);
                     }
-                }, 200);
+                }, 50); //<- 0.05sごとに情報更新
             } else {
                 Log.d("GPS", "Location not found");
                 Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
@@ -144,12 +145,11 @@ public class DriveActivity extends Activity {
         } else {
             buttonFlag = true;
             strStpButton.setText("Start");
+            Log.d("Timer:", "Stop");
             mHandler.removeCallbacksAndMessages(null);
         }
     }
 
-
-    Location oldLocation;
 
     //情報の更新
     public void infoUpdate() {
@@ -177,16 +177,15 @@ public class DriveActivity extends Activity {
 
     public void setStartInfo() {
         startSpeed = mSpeed;
-        startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();//ブレーキ開始時刻
     }
 
     public void setEndInfo() {
         endSpeed = mSpeed;
+        finTime = System.currentTimeMillis() - startTime;//ブレーキ終了時刻
         azMax = mSA.getAzMax();
         //TODO もしかすると，Calclaterクラスで計算させたほうがいいかもしれない．
         azPeakTime = mSA.getPeakTime() - startTime; // msで取得されている
-
-
     }
 
     //計測データの記録
@@ -199,23 +198,19 @@ public class DriveActivity extends Activity {
     public void judge() {
 
         int flag; //何から何に状態が変わったか入れとく
-        if(modeFlag) {
-            //if (mSA.mainFunc(A[0], A[1], A[2], GPS.Inst().getSpeed())) {
+        if (modeFlag) {
             flag = mSA.mainFunc(A[0], A[1], A[2], GPS.Inst().getSpeed());
-                if (flag == 1) {
-                    Log.v("judge","ブレーキ始め");
-                    setStartInfo();
-                    stateCount = 1;
-                } else if(flag == 2) {
-                    Log.v("judge","ブレーキ終わり");
-                    setEndInfo();
-                    //理想のピーク時刻を取得するメソッドに，上の情報を投げる
-                    mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, azMax);
-
-                    stateCount = 0;
-                }
-            //}
-
+            if (flag == 1) {
+                Log.v("judge", "ブレーキ始め");
+                setStartInfo();
+                stateCount = 1;
+            } else if (flag == 2) {
+                Log.v("judge", "ブレーキ終わり");
+                setEndInfo();
+                //理想のピーク時刻を取得するメソッドに，上の情報を投げる
+                mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime,finTime, azMax);
+                stateCount = 0;
+            }
             if (flag == 1) {
                 dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
             } else {

@@ -1,5 +1,6 @@
 package zack.inc.jp.studytest2;
 
+import android.provider.Settings;
 import android.support.annotation.IntegerRes;
 import android.util.Log;
 
@@ -11,7 +12,13 @@ public class SceneAnalyzer {
 
     static final int STORE_MAX = 5; //1sec
     private float Ax[] = new float[STORE_MAX], Ay[] = new float[STORE_MAX], Az[] = new float[STORE_MAX];
-    private int p=0;
+    //TODO getArrayIndexをつかったほうがいい？
+    private float accelecAzArray[] = new float[Define.SENSOR_STORE_MAX];//Max 50s
+    private double timeArray[] = new double[Define.SENSOR_STORE_MAX];//Max 50s
+    private int arraysIndex = 0;
+    private long brakeStartTime;
+
+    private int p = 0;
     private double speed;
     private int result = 1;
     private int state = 0;
@@ -20,16 +27,6 @@ public class SceneAnalyzer {
     //運転の状態に応じて状態値を返すメソッド
     public int judgeStatus() {
 
-        /*
-        //条件に不備がある？(speed > 1.4 && Az > 0.5fのときブレーキ中に走行状態と判定される)
-        if (Az > 0.6f && speed > 1.4) {
-            return 1; //ブレーキ中が状態1->開始時の加速度閾値0.6f
-        } else if (speed <= 1.4 && Az < 0.4f) {
-            return 2; //停車中が状態orブレーキ終了状態2->加速度閾値終了0.4f
-        } else {
-            return 3;//走行中が状態3->ある程度の速度がある時でブレーキがない時
-        }
-        */
 
         //シーン判定改良版
         //TODO 閾値の部分の調整 -> 速度&加速度での閾値を見るべきかもしてない
@@ -37,10 +34,10 @@ public class SceneAnalyzer {
         switch (state) {
             case 0://STOP
                 if (speed > 5.0) state = 1;
-                else if (Az[p] > 0.5) state = 2;//TODO 2Time Teaching
+                else if (Az[p] > 0.5) state = 2;//TODO 2Times Teaching
                 return 2;
             case 1://CRUISE
-                if (speed < 0.0) state = 0;
+                if (speed == 0.0) state = 0;
                 else if (Az[p] > 0.5) state = 2;
                 return 3;
             case 2://BRAKE
@@ -53,7 +50,7 @@ public class SceneAnalyzer {
                 if (isStop() || speed == 0) state = 0;
                 // ポンピングブレーキのとき
                 if (Az[getArrayIndex(p - 1)] > 0.4 && Az[p] < 0.4) {
-                    if (speed > 3.0) state = 1; //TODO adjust// cruise
+                    if (speed > 3.0) state = 1; //10km/h 以上だとポンピングブレーキ
                 }
                 if (Az[p] < -0.5) state = 1;
                 return 1;
@@ -100,7 +97,7 @@ public class SceneAnalyzer {
     private long azPeakTime;
 
     //200ms間隔で呼び出されるメソッド
-    public int  mainFunc(float aX, float aY, float aZ, double v) {
+    public int mainFunc(float aX, float aY, float aZ, double v) {
         p = getArrayIndex(p + 1);
         Ax[p] = aX;
         Ay[p] = aY;
@@ -113,6 +110,8 @@ public class SceneAnalyzer {
             if (instate1 == false) {
                 //ブレーキ開始時刻，位置座標，速度を記録 return true
                 // 初めて3 -> 1変わった．
+                arraysIndex = 0;//Indexを0に戻す．
+                brakeStartTime = System.currentTimeMillis();//ブレーキ開始時刻
                 instate1 = true;
                 instate2 = false;
                 return 1;
@@ -123,6 +122,9 @@ public class SceneAnalyzer {
                 azMax = Az[p];
                 azPeakTime = System.currentTimeMillis();
             }
+
+            storeSensorValues(brakeStartTime, aZ); //時間とセンサー値を溜め込んでいく
+
 
             return 0;
 
@@ -145,11 +147,30 @@ public class SceneAnalyzer {
     }
 
 
+    public void storeSensorValues(long startTime, float aZ) {
+        accelecAzArray[arraysIndex] = aZ;
+        timeArray[arraysIndex] = (System.currentTimeMillis() - startTime) / 1000; //(s)
+
+        arraysIndex++;
+    }
+
     //各getterの記述(速度，位置座標に関してはDriveActivity側での取得がいいかも？)
     public double getSpeed() {
         //開始速度
         //終了速度
         return speed;
+    }
+
+    public float[] getAzArray(){
+        return accelecAzArray;
+    }
+
+    public double[] getTimeArray(){
+        return timeArray;
+    }
+
+    public int getArraysIndex(){
+        return arraysIndex;
     }
 
 

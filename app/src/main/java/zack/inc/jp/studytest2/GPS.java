@@ -83,9 +83,6 @@ public class GPS implements LocationListener {
         longitude = location.getLongitude();
         gpsSpeed = location.getSpeed();
         this.location = location;
-        //Log.v("----------", "----------");
-        //Log.v("Latitude", String.valueOf(location.getLatitude()));
-        //Log.v("Longitude", String.valueOf(location.getLongitude()));
         if(location.getSpeed()==0){
             Log.v("speed", String.valueOf(location.getSpeed()));
         }

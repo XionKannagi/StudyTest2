@@ -2,6 +2,8 @@ package zack.inc.jp.studytest2;
 
 import android.content.Context;
 import android.location.Location;
+import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Created by togane on 2016/09/28.
@@ -14,6 +16,7 @@ public class Calclater {
     private double finTime;
     private double peakTime;
     private Context appContext;
+    private SoundPlayer mSoundPlayer;
     private static int BRAKE_PATTERN_FRONT_PEAK_1 = 1;//理想に対してだいぶ早い
     private static int BRAKE_PATTERN_FRONT_PEAK_2 = 2;//理想に対してすこし早い
     private static int BREAK_PATTERN_BACK_PEAK_1 = 3;//理想に対してだいぶ遅い
@@ -32,8 +35,7 @@ public class Calclater {
     /**
      * 理想値を算出するメソッド．
      * minimum jerk Theory そのまま
-      *
-     * **/
+     **/
     public double[] getIdealPeakTimes(double initSpeed, double endSpeed, float distance) {
 
         double finTime;
@@ -57,6 +59,7 @@ public class Calclater {
      * 理想値を算出するメソッド．
      * 実測値を元にminimum jerk theoryを適応
      * そのままだと，誤差が大きかったが，これを使うとある程度，実際の運転に即して評価できる
+     * これは，単純にtmの理想値がtfの理想値の定数倍であることに着目して，実際のtfに同じ定数をかけたもの
      **/
 
     public double getIdealPeakTime(double finTime) {
@@ -87,35 +90,142 @@ public class Calclater {
 
         double[] idealPeakTimeResults;
         double idealPeakTimeResult;
+        double idealFinTimeResult;
         TeachResult teachResult = new TeachResult(appContext);
+        mSoundPlayer = new SoundPlayer(appContext);
 
         idealPeakTimeResults = getIdealPeakTimes(initSpeed, endSpeed, distance);
         idealPeakTimeResult = idealPeakTimeResults[0];
+        idealFinTimeResult = idealPeakTimeResults[1];
 
 
-        //idealPeakTimeResult = getIdealPeakTime(finTime);
-
-
+        //TODO finTimeの情報を入れるといいかも
         //教示用のメソッドに投げる
         if (azMax > 2.94) {
             teachResult.teaching(BRAKE_PATTERN_SUDDEN);//加速度のピークが2.94を超えていたら急ブレーキ
+            mSoundPlayer.play(BRAKE_PATTERN_SUDDEN);
         } else if ((idealPeakTimeResult - goodTimeRange) > ((double) peakTime) / 1000) {//理想よりも手前ピークのとき
             if ((idealPeakTimeResult - (goodTimeRange + badTimeRange)) > ((double) peakTime) / 1000) {
                 teachResult.teaching(BRAKE_PATTERN_FRONT_PEAK_1);
+                mSoundPlayer.play(BRAKE_PATTERN_FRONT_PEAK_1);
             } else {
                 teachResult.teaching(BRAKE_PATTERN_FRONT_PEAK_2);
+                mSoundPlayer.play(BRAKE_PATTERN_FRONT_PEAK_2);
             }
         } else if ((idealPeakTimeResult + goodTimeRange) < ((double) peakTime) / 1000) {//理想よりも奥ピークのとき
             if ((idealPeakTimeResult + (goodTimeRange + badTimeRange)) < ((double) peakTime) / 1000) {
                 teachResult.teaching(BREAK_PATTERN_BACK_PEAK_1);
+                mSoundPlayer.play(BREAK_PATTERN_BACK_PEAK_1);
             } else {
                 teachResult.teaching(BREAK_PATTERN_BACK_PEAK_2);
+                mSoundPlayer.play(BREAK_PATTERN_BACK_PEAK_2);
             }
         } else { //それ以外はおそらく良いブレーキ
             teachResult.teaching(BREAK_PATTERN_GOOD);
+            mSoundPlayer.play(BREAK_PATTERN_GOOD);
 
         }
     }
+
+    public void caseSeparatorV2(double initSpeed, double endSpeed, float distance, long peakTime, long finTime, float azMax, int arraysIndex, double[] timeArray, float[] acceleAzArray) {
+
+        double[] idealPeakTimeResults;
+        double idealFinTimeResult;
+        double delta_v;
+
+
+        idealPeakTimeResults = getIdealPeakTimes(initSpeed, endSpeed, distance);
+        idealFinTimeResult = idealPeakTimeResults[1];
+        delta_v = endSpeed - initSpeed;
+
+        evalBrake(distance, idealFinTimeResult, delta_v, arraysIndex, timeArray, acceleAzArray);//TODO Jerkで評価できるようにするもの．
+
+    }
+
+    //理想値でのグラフを作るメソッド
+    public void evalBrake(float dist, double idealFinTime, double deltaV, int Index, double[] timeArray, float[] acceleAzArray) {
+
+        double b0, b1, b2;
+        double idealAcceleArray[] = new double[Index];
+        int peakTimeIndex = 0;
+
+
+        b0 = (6 * (double) dist / Math.pow(idealFinTime, 5) - (3 * deltaV / Math.pow(idealFinTime, 4)));
+
+        b1 = (15 * (double) dist / Math.pow(idealFinTime, 4) - (8 * deltaV / Math.pow(idealFinTime, 3)));
+
+        b2 = (10 * (double) dist / Math.pow(idealFinTime, 3) - (6 * deltaV / Math.pow(idealFinTime, 2)));
+
+
+        for (int i = 0; i < Index; i++) {
+            idealAcceleArray[i] = -((20 * b0 * Math.pow(timeArray[i], 3)) - (12 * b1 * Math.pow(timeArray[i], 2)) + 6 * b2 * timeArray[i]);
+            if (i > 0) {
+                if (idealAcceleArray[i - 1] < idealAcceleArray[i]) {
+                    peakTimeIndex = i;
+                }
+            }
+        }
+
+        calcJerks(idealAcceleArray, acceleAzArray, Index, peakTimeIndex);
+
+    }
+
+
+    //それぞれのJerkを計算しグラフ化
+    public void calcJerks(double[] idealAcceleArray, float[] acceleAzArray, int Index, int peakTimeIndex) {
+
+        double idealJerk[] = new double[Index];
+        double acceleAzJerk[] = new double[Index];
+
+        idealJerk[0] = 0;
+        acceleAzJerk[0] = 0;
+
+        for (int i = 1; i < Index; i++) {
+            idealJerk[i] = idealAcceleArray[i] - idealAcceleArray[i - 1];
+            acceleAzJerk[i] = (double) acceleAzArray[i] - (double) acceleAzArray[i - 1];
+        }
+
+        evalJerks(idealJerk, acceleAzJerk, peakTimeIndex, Index);
+    }
+
+
+    //理想値でのピークの前後半で実測とのJerkの差を計算
+    public void evalJerks(double[] idealJerk, double[] acceleAzJerk, int peakTimeIndex, int Index) {
+
+        double beforeSumValue = 0.0d;
+        double afterSumValue = 0.0d;
+        double beforeAverage;
+        double afterAverage;
+        int beforeCount = 0;
+        int afterCount = 0;
+        TeachResult teachResult = new TeachResult(appContext);
+
+        for (int i = 1; i <= peakTimeIndex; i++) {
+            beforeSumValue += idealJerk[i] - acceleAzJerk[i];//マイナス踏みすぎ
+            beforeCount++;
+        }
+
+        beforeAverage = beforeSumValue / beforeCount;
+
+
+        for (int i = peakTimeIndex + 1; i < Index; i++) {
+            afterSumValue += idealJerk[i] - acceleAzJerk[i];//マイナス踏まなすぎ
+            afterCount++;
+        }
+
+        afterAverage = afterSumValue / afterCount;
+
+        Toast.makeText(appContext, "beforeValue:" + beforeAverage + "afterValue:" + afterAverage, Toast.LENGTH_LONG).show();
+        //TODO 教示部分を書く
+
+    }
+
+    //
+    public void onDestroy() {
+        mSoundPlayer.onDestroy();
+    }
+
+
 
 }
 

@@ -4,17 +4,14 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
-import android.os.Handler;;
+import android.os.Handler;
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -137,7 +134,7 @@ public class DriveActivity extends Activity {
                         //TODO 更新，sampling を 25,50,100msに変更してみる
                         //mHandler.postDelayed(this, 200);
                     }
-                }, 50); //<- 0.05sごとに情報更新
+                }, 100); //<- 0.1sごとに情報更新
             } else {
                 Log.d("GPS", "Location not found");
                 Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
@@ -186,7 +183,12 @@ public class DriveActivity extends Activity {
         azMax = mSA.getAzMax();
         //TODO もしかすると，Calclaterクラスで計算させたほうがいいかもしれない．
         azPeakTime = mSA.getPeakTime() - startTime; // msで取得されている
+
+
     }
+
+
+
 
     //計測データの記録
     public void infoSave() {
@@ -209,6 +211,8 @@ public class DriveActivity extends Activity {
                 setEndInfo();
                 //理想のピーク時刻を取得するメソッドに，上の情報を投げる
                 mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime,finTime, azMax);
+                //mCalc.caseSeparatorV2(startSpeed,endSpeed,dist,azPeakTime,finTime,azMax,mSA.getArraysIndex(),mSA.getTimeArray(),mSA.getAzArray());//TODO ここを動かすとv２が動きます
+
                 stateCount = 0;
             }
             if (flag == 1) {
@@ -254,6 +258,12 @@ public class DriveActivity extends Activity {
     public void onStop() {
         super.onStop();
         mHandler.removeCallbacksAndMessages(null);
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        mCalc.onDestroy();
     }
 
 

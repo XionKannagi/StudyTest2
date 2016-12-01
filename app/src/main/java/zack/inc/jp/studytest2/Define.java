@@ -6,7 +6,7 @@ package zack.inc.jp.studytest2;
 public class Define {
 
     // for Accelerometer, GyroSensor センサーの値を保存しておく最大数
-    static final int SENSOR_STORE_MAX = 300;
+    static final int SENSOR_STORE_MAX = 500;
 
     //for GraphSurfaceView, LevelingController 横Gのサンプリング周期(ms)
     static int LATERAL_G_FORCE_SAMPLING_RATE_Hz = 12;

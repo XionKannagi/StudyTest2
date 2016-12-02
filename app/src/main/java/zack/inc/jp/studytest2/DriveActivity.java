@@ -132,7 +132,7 @@ public class DriveActivity extends Activity {
                         //infoSave(); //<- 情報をLogに記録
                         judge(); //<-こいつを動かすと判定＋教示がされる
                         //TODO 更新，sampling を 25,50,100msに変更してみる
-                        //mHandler.postDelayed(this, 200);
+                        mHandler.postDelayed(this, 200);
                     }
                 }, 100); //<- 0.1sごとに情報更新
             } else {

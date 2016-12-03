@@ -90,7 +90,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="New Text" />
@@ -126,7 +126,6 @@
         android:layout_height="wrap_content"
         android:text="Back"
         android:id="@+id/button2"
-
         android:onClick="goBack"
         android:layout_alignTop="@+id/str_stp_Button"
         android:layout_alignParentLeft="true"
@@ -152,7 +151,8 @@
         android:layout_alignRight="@+id/linearLayout"
         android:layout_alignEnd="@+id/linearLayout"
         android:layout_alignBottom="@+id/str_stp_Button"
-        android:onClick="onSwitchCheck" />
+        android:onClick="onSwitchCheck"
+        android:checked="false"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -164,5 +164,25 @@
         android:layout_toStartOf="@+id/switch1"
         android:layout_alignBottom="@+id/switch1"
         android:gravity="center_vertical" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/logModeSwitch"
+        android:layout_below="@+id/switch1"
+        android:layout_alignEnd="@+id/switch1"
+        android:onClick="onLogSwitchChecked"
+        android:checked="false"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Log mode"
+        android:singleLine="false"
+        android:id="@+id/logModeText"
+        android:layout_alignTop="@+id/logModeSwitch"
+        android:layout_toStartOf="@+id/logModeSwitch"
+        android:layout_alignBottom="@+id/logModeSwitch"
+        android:gravity="center_vertical"/>
 
 </RelativeLayout>

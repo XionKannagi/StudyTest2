@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="teachModeColorPrimary">#c9328d</color>
     <color name="teachModeColorPrimaryDark">#762556</color>
+    <color name="LogModeTextColor">#63ed0d</color>
 </resources>

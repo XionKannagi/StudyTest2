@@ -3,9 +3,11 @@ package zack.inc.jp.studytest2;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -28,8 +30,10 @@ public class DriveActivity extends Activity {
     TextView latitudeText;
     TextView longitudeText;
     TextView driverNameText;
+    TextView logModeText;
     Button strStpButton;
     Switch modeSwitch;
+    Switch logModeSwitch;
     ActionBar mActionBar;
     private DataLogger DL;
     private SceneAnalyzer mSA;
@@ -56,7 +60,9 @@ public class DriveActivity extends Activity {
     private float A[] = new float[3];
     private boolean buttonFlag = true;
     private boolean modeFlag; //教示モード <-> 計測モード 切り替えよう
+    private boolean logModeFlag;
     private Handler mHandler = new Handler();
+    private static int SUMPLING_RATE = 100;//ms
 
 
     @Override
@@ -92,6 +98,10 @@ public class DriveActivity extends Activity {
 
         mActionBar = getActionBar();
         mActionBar.setTitle("Measuring");
+
+        logModeText =  (TextView)findViewById(R.id.logModeText);
+        logModeText.setText("No loging");
+        logModeText.setTextColor(Color.RED);
 
         driverNameText.setText(driverName);
         infoUpdate();
@@ -129,12 +139,12 @@ public class DriveActivity extends Activity {
                     public void run() {
                         //handlerの関係で，この中での処理は避けるべき．
                         infoUpdate(); //<- 情報を更新
-                        //infoSave(); //<- 情報をLogに記録
+                        infoSave(); //<- 情報をLogに記録
                         judge(); //<-こいつを動かすと判定＋教示がされる
                         //TODO 更新，sampling を 25,50,100msに変更してみる
-                        mHandler.postDelayed(this, 200);
+                        mHandler.postDelayed(this, SUMPLING_RATE);
                     }
-                }, 100); //<- 0.1sごとに情報更新
+                }, SUMPLING_RATE); //<- 0.1sごとに情報更新
             } else {
                 Log.d("GPS", "Location not found");
                 Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
@@ -192,7 +202,9 @@ public class DriveActivity extends Activity {
 
     //計測データの記録
     public void infoSave() {
-        DL.saveLog(System.currentTimeMillis(), A[0], A[1], A[2], mLatitude, mLongitude, mSpeed);//記録テスト
+        if(logModeFlag) {
+            DL.saveLog(System.currentTimeMillis(), A[0], A[1], A[2], mLatitude, mLongitude, mSpeed);//記録テスト
+        }
     }
 
 
@@ -252,6 +264,23 @@ public class DriveActivity extends Activity {
             modeFlag = false;//計測モードのみのとき
         }
 
+    }
+
+    public void onLogSwitchChecked(View v){
+        logModeSwitch = (Switch) v;
+
+        if(logModeSwitch.isChecked()){
+            logModeFlag = true;
+            logModeText.setText("Loging...");
+            logModeText.setTextColor(getResources().getColor(R.color.LogModeTextColor));
+            Log.d("log switch","on");
+
+        } else {
+            logModeFlag = false;
+            logModeText.setText("No Loging");
+            logModeText.setTextColor(Color.RED);
+            Log.d("log switch","off");
+        }
     }
 
     @Override

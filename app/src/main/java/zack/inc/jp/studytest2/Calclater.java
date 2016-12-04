@@ -138,7 +138,7 @@ public class Calclater {
 
         idealPeakTimeResults = getIdealPeakTimes(initSpeed, endSpeed, distance);
         idealFinTimeResult = idealPeakTimeResults[1];
-        delta_v = endSpeed - initSpeed;
+        delta_v = initSpeed - endSpeed;
 
         if(arraysIndex != 0) {
             evalBrake(distance, idealFinTimeResult, delta_v, arraysIndex, timeArray, acceleAzArray);//TODO Jerkで評価できるようにするもの．
@@ -159,9 +159,12 @@ public class Calclater {
         b2 = (10 * (double) dist / Math.pow(idealFinTime, 3) - (6 * deltaV / Math.pow(idealFinTime, 2)));
 
 
+       // Log.i("evalBrake", "Index:" + Index);
         for (int i = 0; i < Index; i++) {
             idealAcceleArray[i] = -((20 * b0 * Math.pow(timeArray[i], 3)) - (12 * b1 * Math.pow(timeArray[i], 2)) + 6 * b2 * timeArray[i]);
+
             if (i > 0) {
+                //Log.i("evalBrake", "i-1:" + idealAcceleArray[i-1] + " i:" + idealAcceleArray[i]);
                 if (idealAcceleArray[i - 1] < idealAcceleArray[i]) {
                     peakTimeIndex = i;
                 }
@@ -218,7 +221,8 @@ public class Calclater {
 
         afterAverage = afterSumValue / afterCount;
 
-        Toast.makeText(appContext, "beforeValue:" + beforeAverage + "afterValue:" + afterAverage, Toast.LENGTH_LONG).show();
+        //Toast.makeText(appContext, "beforeValue:" + beforeAverage + "afterValue:" + afterAverage, Toast.LENGTH_LONG).show();
+        Log.i("calcなんたら", "beforeValue:" + beforeAverage + "afterValue:" + afterAverage + "peakTimeIndex:" + peakTimeIndex);
         //TODO 教示部分を書く
 
     }

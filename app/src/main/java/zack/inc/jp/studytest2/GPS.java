@@ -95,14 +95,14 @@ public class GPS implements LocationListener {
     public double getLongitude() {return longitude;}
 
     public double getSpeed() {
-        /*
+
         if (((System.currentTimeMillis()/1000) % 5 == 0) && (System.currentTimeMillis()%1000) % 200  == 0) {
             return 0.0;
         } else {
             return 5.0;
         }
-        */
-        return gpsSpeed;
+
+        //return gpsSpeed;
     }
 
     public Location getLocation() {return location;}

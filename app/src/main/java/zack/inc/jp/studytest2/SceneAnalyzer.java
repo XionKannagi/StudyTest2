@@ -114,6 +114,7 @@ public class SceneAnalyzer {
                 arraysIndex = 0;//Indexを0に戻す．
                 brakeStartTime = System.currentTimeMillis();//ブレーキ開始時刻
                 /*** いろいろしょきか ***/
+                //Log.i("getArrayIndex", "is called:" + arraysIndex);
                 azMax = 0.0f;
                 azPeakTime = 0;
 
@@ -156,6 +157,7 @@ public class SceneAnalyzer {
 
 
     public void storeSensorValues(long startTime, float aZ) {
+        Log.i("storeSensorVal", "index:" + arraysIndex);
         accelecAzArray[arraysIndex] = aZ;
         timeArray[arraysIndex] = (System.currentTimeMillis() - startTime) / 1000; //(s)
 
@@ -178,6 +180,7 @@ public class SceneAnalyzer {
     }
 
     public int getArraysIndex(){
+        Log.i("getArrayIndex", "is called:" + arraysIndex);
         return arraysIndex;
     }
 

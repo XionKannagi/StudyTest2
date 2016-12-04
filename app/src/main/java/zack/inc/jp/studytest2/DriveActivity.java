@@ -223,8 +223,9 @@ public class DriveActivity extends Activity {
                 Log.v("judge", "ブレーキ終わり");
                 setEndInfo();
                 //理想のピーク時刻を取得するメソッドに，上の情報を投げる
-                mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime,finTime, azMax);
-                //mCalc.caseSeparatorV2(startSpeed,endSpeed,dist,azPeakTime,finTime,azMax,mSA.getArraysIndex(),mSA.getTimeArray(),mSA.getAzArray());//TODO ここを動かすとv２が動きます
+                //mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime,finTime, azMax);
+
+                mCalc.caseSeparatorV2(startSpeed,endSpeed,dist,azPeakTime,finTime,azMax,mSA.getArraysIndex(),mSA.getTimeArray(),mSA.getAzArray());//TODO ここを動かすとv２が動きます
 
                 stateCount = 0;
             }

@@ -106,29 +106,37 @@ public class SceneAnalyzer {
 
         result = judgeStatus();
         //ブレーキ中の挙動->加速度のピークとその時の時間を記録
-        if (result == 1) {
+        if (result == 1) { // brake
+            int ret = 0;
             if (instate1 == false) {
                 //ブレーキ開始時刻，位置座標，速度を記録 return true
                 // 初めて3 -> 1変わった．
                 arraysIndex = 0;//Indexを0に戻す．
                 brakeStartTime = System.currentTimeMillis();//ブレーキ開始時刻
+                /*** いろいろしょきか ***/
+                azMax = 0.0f;
+                azPeakTime = 0;
+
+                Log.i("mainFunc", "brakeStartTime = " + brakeStartTime);
                 instate1 = true;
                 instate2 = false;
-                return 1;
+                //storeSensorValues(brakeStartTime, aZ); //時間とセンサー値を溜め込んでいく////
+                 ret = 1;
+                // return 1;
             }
 
             if (azMax < Az[p]) {
                 //ピーク時の時刻も記録
                 azMax = Az[p];
-                azPeakTime = System.currentTimeMillis();
+                azPeakTime = System.currentTimeMillis() -brakeStartTime;
+                Log.i("mainFunc"," peakTime = " + azPeakTime);
+
             }
 
             storeSensorValues(brakeStartTime, aZ); //時間とセンサー値を溜め込んでいく
+            return ret;
 
-
-            return 0;
-
-        } else if (result == 2) {
+        } else if (result == 2) { // stop
             if (instate1 == true) {
                 instate1 = false;
                 instate2 = true;
@@ -136,7 +144,7 @@ public class SceneAnalyzer {
             }
             return 0;
 
-        } else if (result == 3) {
+        } else if (result == 3) { //cruie
             instate1 = false;
             instate2 = false;
             return 0;

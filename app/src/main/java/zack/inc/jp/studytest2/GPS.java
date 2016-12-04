@@ -9,6 +9,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
@@ -93,7 +94,16 @@ public class GPS implements LocationListener {
 
     public double getLongitude() {return longitude;}
 
-    public double getSpeed() {return gpsSpeed;}
+    public double getSpeed() {
+        /*
+        if (((System.currentTimeMillis()/1000) % 5 == 0) && (System.currentTimeMillis()%1000) % 200  == 0) {
+            return 0.0;
+        } else {
+            return 5.0;
+        }
+        */
+        return gpsSpeed;
+    }
 
     public Location getLocation() {return location;}
 

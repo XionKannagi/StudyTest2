@@ -104,7 +104,7 @@ public class DriveActivity extends Activity {
         logModeText.setTextColor(Color.RED);
 
         driverNameText.setText(driverName);
-        infoUpdate();
+        //infoUpdate();
 
     }
 
@@ -139,7 +139,7 @@ public class DriveActivity extends Activity {
                     public void run() {
                         //handlerの関係で，この中での処理は避けるべき．
                         infoUpdate(); //<- 情報を更新
-                        infoSave(); //<- 情報をLogに記録
+                        //infoSave(); //<- 情報をLogに記録
                         judge(); //<-こいつを動かすと判定＋教示がされる
                         //TODO 更新，sampling を 25,50,100msに変更してみる
                         mHandler.postDelayed(this, SUMPLING_RATE);
@@ -192,7 +192,7 @@ public class DriveActivity extends Activity {
         finTime = System.currentTimeMillis() - startTime;//ブレーキ終了時刻
         azMax = mSA.getAzMax();
         //TODO もしかすると，Calclaterクラスで計算させたほうがいいかもしれない．
-        azPeakTime = mSA.getPeakTime() - startTime; // msで取得されている
+        azPeakTime = mSA.getPeakTime();// - startTime; // msで取得されている
 
 
     }
@@ -215,6 +215,7 @@ public class DriveActivity extends Activity {
         if (modeFlag) {
             flag = mSA.mainFunc(A[0], A[1], A[2], GPS.Inst().getSpeed());
             if (flag == 1) {
+
                 Log.v("judge", "ブレーキ始め");
                 setStartInfo();
                 stateCount = 1;
@@ -228,9 +229,10 @@ public class DriveActivity extends Activity {
                 stateCount = 0;
             }
             if (flag == 1) {
-                dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
-            } else {
                 dist = 0;
+            } else {
+                dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
+
             }
 
         } else {

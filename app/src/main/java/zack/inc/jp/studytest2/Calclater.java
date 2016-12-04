@@ -43,7 +43,7 @@ public class Calclater {
         double[] results = new double[2];
 
         //速度と止まるまでの距離から算出した減速終了時間
-        finTime = ((2 * (6 - Math.sqrt(6))) * distance) / (3 * (endSpeed - initSpeed));
+        finTime = ((2 * (6 - Math.sqrt(6))) * distance) / (3 * (initSpeed-endSpeed));
 
         //理想的な減速終了時間を用いた減速度最大時刻
         peakTime = (8 * p - 15 - Math.sqrt(19 * p * p - 75 * p + 75)) * finTime / (15 * (p - 2));
@@ -107,6 +107,7 @@ public class Calclater {
         } else if ((idealPeakTimeResult - goodTimeRange) > ((double) peakTime) / 1000) {//理想よりも手前ピークのとき
             if ((idealPeakTimeResult - (goodTimeRange + badTimeRange)) > ((double) peakTime) / 1000) {
                 teachResult.teaching(BRAKE_PATTERN_FRONT_PEAK_1);
+                // log idealPeakTimeResult(left), peakTime(right)
                 mSoundPlayer.play(BRAKE_PATTERN_FRONT_PEAK_1);
             } else {
                 teachResult.teaching(BRAKE_PATTERN_FRONT_PEAK_2);
@@ -125,6 +126,7 @@ public class Calclater {
             mSoundPlayer.play(BREAK_PATTERN_GOOD);
 
         }
+        Log.i("caseSeparator", idealPeakTimeResult + " " + peakTime);
     }
 
     public void caseSeparatorV2(double initSpeed, double endSpeed, float distance, long peakTime, long finTime, float azMax, int arraysIndex, double[] timeArray, float[] acceleAzArray) {
@@ -138,8 +140,9 @@ public class Calclater {
         idealFinTimeResult = idealPeakTimeResults[1];
         delta_v = endSpeed - initSpeed;
 
-        evalBrake(distance, idealFinTimeResult, delta_v, arraysIndex, timeArray, acceleAzArray);//TODO Jerkで評価できるようにするもの．
-
+        if(arraysIndex != 0) {
+            evalBrake(distance, idealFinTimeResult, delta_v, arraysIndex, timeArray, acceleAzArray);//TODO Jerkで評価できるようにするもの．
+        }
     }
 
     //理想値でのグラフを作るメソッド
@@ -150,10 +153,9 @@ public class Calclater {
         int peakTimeIndex = 0;
 
 
+        /* 係数 */
         b0 = (6 * (double) dist / Math.pow(idealFinTime, 5) - (3 * deltaV / Math.pow(idealFinTime, 4)));
-
         b1 = (15 * (double) dist / Math.pow(idealFinTime, 4) - (8 * deltaV / Math.pow(idealFinTime, 3)));
-
         b2 = (10 * (double) dist / Math.pow(idealFinTime, 3) - (6 * deltaV / Math.pow(idealFinTime, 2)));
 
 
@@ -176,6 +178,7 @@ public class Calclater {
 
         double idealJerk[] = new double[Index];
         double acceleAzJerk[] = new double[Index];
+
 
         idealJerk[0] = 0;
         acceleAzJerk[0] = 0;

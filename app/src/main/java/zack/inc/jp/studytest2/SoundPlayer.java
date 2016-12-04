@@ -68,6 +68,7 @@ public class SoundPlayer {
     }
 
     public void onDestroy() {
+
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
         }

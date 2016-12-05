@@ -107,26 +107,30 @@ public class SceneAnalyzer {
         result = judgeStatus();
         //ブレーキ中の挙動->加速度のピークとその時の時間を記録
         if (result == 1) {
+            int ret = 0;
             if (instate1 == false) {
                 //ブレーキ開始時刻，位置座標，速度を記録 return true
                 // 初めて3 -> 1変わった．
+                /**shokika**/
                 arraysIndex = 0;//Indexを0に戻す．
                 brakeStartTime = System.currentTimeMillis();//ブレーキ開始時刻
+                azMax = 0.0f;
+                /**      **/
                 instate1 = true;
                 instate2 = false;
-                return 1;
+                ret = 1;
             }
 
             if (azMax < Az[p]) {
-                //ピーク時の時刻も記録
+                //TODO ピーク時の時刻も記録
                 azMax = Az[p];
-                azPeakTime = System.currentTimeMillis();
+                azPeakTime = System.currentTimeMillis() - brakeStartTime;
             }
 
             storeSensorValues(brakeStartTime, aZ); //時間とセンサー値を溜め込んでいく
 
 
-            return 0;
+            return ret;
 
         } else if (result == 2) {
             if (instate1 == true) {
@@ -148,6 +152,7 @@ public class SceneAnalyzer {
 
 
     public void storeSensorValues(long startTime, float aZ) {
+        Log.i("call storeSensorValues" ,"index" + arraysIndex);
         accelecAzArray[arraysIndex] = aZ;
         timeArray[arraysIndex] = (System.currentTimeMillis() - startTime) / 1000; //(s)
 
@@ -161,15 +166,15 @@ public class SceneAnalyzer {
         return speed;
     }
 
-    public float[] getAzArray(){
+    public float[] getAzArray() {
         return accelecAzArray;
     }
 
-    public double[] getTimeArray(){
+    public double[] getTimeArray() {
         return timeArray;
     }
 
-    public int getArraysIndex(){
+    public int getArraysIndex() {
         return arraysIndex;
     }
 

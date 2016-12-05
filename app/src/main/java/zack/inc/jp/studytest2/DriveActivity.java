@@ -100,7 +100,7 @@ public class DriveActivity extends Activity {
         mActionBar.setTitle("Measuring");
 
         logModeText =  (TextView)findViewById(R.id.logModeText);
-        logModeText.setText("No loging");
+        logModeText.setText("Logging OFF");
         logModeText.setTextColor(Color.RED);
 
         driverNameText.setText(driverName);
@@ -192,7 +192,7 @@ public class DriveActivity extends Activity {
         finTime = System.currentTimeMillis() - startTime;//ブレーキ終了時刻
         azMax = mSA.getAzMax();
         //TODO もしかすると，Calclaterクラスで計算させたほうがいいかもしれない．
-        azPeakTime = mSA.getPeakTime() - startTime; // msで取得されている
+        azPeakTime = mSA.getPeakTime(); // msで取得されている
 
 
     }
@@ -203,7 +203,7 @@ public class DriveActivity extends Activity {
     //計測データの記録
     public void infoSave() {
         if(logModeFlag) {
-            DL.saveLog(System.currentTimeMillis(), A[0], A[1], A[2], mLatitude, mLongitude, mSpeed);//記録テスト
+            DL.saveLog(System.currentTimeMillis(), A[0], A[1], A[2], mLatitude, mLongitude, mSpeed);//記録
         }
     }
 
@@ -228,9 +228,10 @@ public class DriveActivity extends Activity {
                 stateCount = 0;
             }
             if (flag == 1) {
-                dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
-            } else {
                 dist = 0;
+            } else{
+                dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
+
             }
 
         } else {
@@ -271,15 +272,13 @@ public class DriveActivity extends Activity {
 
         if(logModeSwitch.isChecked()){
             logModeFlag = true;
-            logModeText.setText("Loging...");
+            logModeText.setText("Logging ON");
             logModeText.setTextColor(getResources().getColor(R.color.LogModeTextColor));
-            Log.d("log switch","on");
 
         } else {
             logModeFlag = false;
-            logModeText.setText("No Loging");
+            logModeText.setText("Logging OFF");
             logModeText.setTextColor(Color.RED);
-            Log.d("log switch","off");
         }
     }
 

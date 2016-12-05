@@ -107,28 +107,21 @@ public class Calclater {
         } else if ((idealPeakTimeResult - goodTimeRange) > ((double) peakTime) / 1000) {//理想よりも手前ピークのとき
             if ((idealPeakTimeResult - (goodTimeRange + badTimeRange)) > ((double) peakTime) / 1000) {
                 teachResult.teaching(BRAKE_PATTERN_FRONT_PEAK_1);
-                Log.d("PeakTimes:", idealPeakTimeResult + ":" + peakTime / 1000);
                 mSoundPlayer.play(BRAKE_PATTERN_FRONT_PEAK_1);
-
             } else {
                 teachResult.teaching(BRAKE_PATTERN_FRONT_PEAK_2);
-                Log.d("PeakTimes:", idealPeakTimeResult + ":" + peakTime / 1000);
                 mSoundPlayer.play(BRAKE_PATTERN_FRONT_PEAK_2);
             }
-
         } else if ((idealPeakTimeResult + goodTimeRange) < ((double) peakTime) / 1000) {//理想よりも奥ピークのとき
             if ((idealPeakTimeResult + (goodTimeRange + badTimeRange)) < ((double) peakTime) / 1000) {
                 teachResult.teaching(BREAK_PATTERN_BACK_PEAK_1);
-                Log.d("PeakTimes:", idealPeakTimeResult + ":" + peakTime / 1000);
                 mSoundPlayer.play(BREAK_PATTERN_BACK_PEAK_1);
             } else {
                 teachResult.teaching(BREAK_PATTERN_BACK_PEAK_2);
-                Log.d("PeakTimes:", idealPeakTimeResult + ":" + peakTime / 1000);
                 mSoundPlayer.play(BREAK_PATTERN_BACK_PEAK_2);
             }
         } else { //それ以外はおそらく良いブレーキ
             teachResult.teaching(BREAK_PATTERN_GOOD);
-            Log.d("PeakTimes:", idealPeakTimeResult + ":" + peakTime / 1000);
             mSoundPlayer.play(BREAK_PATTERN_GOOD);
 
         }
@@ -143,7 +136,7 @@ public class Calclater {
 
         idealPeakTimeResults = getIdealPeakTimes(initSpeed, endSpeed, distance);
         idealFinTimeResult = idealPeakTimeResults[1];
-        delta_v = initSpeed - endSpeed;
+        delta_v = endSpeed - initSpeed;
 
         evalBrake(distance, idealFinTimeResult, delta_v, arraysIndex, timeArray, acceleAzArray);//TODO Jerkで評価できるようにするもの．
 
@@ -166,7 +159,6 @@ public class Calclater {
 
         for (int i = 0; i < Index; i++) {
             idealAcceleArray[i] = -((20 * b0 * Math.pow(timeArray[i], 3)) - (12 * b1 * Math.pow(timeArray[i], 2)) + 6 * b2 * timeArray[i]);
-            Log.i("evalBrake", "value [i]" + idealAcceleArray[i]);
             if (i > 0) {
                 if (idealAcceleArray[i - 1] < idealAcceleArray[i]) {
                     peakTimeIndex = i;
@@ -223,17 +215,18 @@ public class Calclater {
 
         afterAverage = afterSumValue / afterCount;
 
-        Toast.makeText(appContext, beforeAverage + ":" + afterAverage, Toast.LENGTH_LONG).show();
+        Toast.makeText(appContext, "beforeValue:" + beforeAverage + "afterValue:" + afterAverage, Toast.LENGTH_LONG).show();
         //TODO 教示部分を書く
 
     }
 
     //
     public void onDestroy() {
-        if (mSoundPlayer != null) {
-            mSoundPlayer.onDestroy();
-        }
+        mSoundPlayer.onDestroy();
     }
+
+
+
 }
 
 

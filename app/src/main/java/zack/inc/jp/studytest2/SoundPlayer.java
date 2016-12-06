@@ -64,6 +64,7 @@ public class SoundPlayer {
             if (voicePlayer[0].isPlaying()) {
                 playerStop();
             }
+            //Release all
             playerRelease();
         }
     }

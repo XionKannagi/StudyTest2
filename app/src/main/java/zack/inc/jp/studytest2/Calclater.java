@@ -43,7 +43,7 @@ public class Calclater {
         double[] results = new double[2];
 
         //速度と止まるまでの距離から算出した減速終了時間
-        finTime = ((2 * (6 - Math.sqrt(6))) * distance) / (3 * (endSpeed - initSpeed));
+        finTime = ((2 * (6 - Math.sqrt(6))) * distance) / (3 * (initSpeed - endSpeed));
 
         //理想的な減速終了時間を用いた減速度最大時刻
         peakTime = (8 * p - 15 - Math.sqrt(19 * p * p - 75 * p + 75)) * finTime / (15 * (p - 2));
@@ -136,7 +136,7 @@ public class Calclater {
 
         idealPeakTimeResults = getIdealPeakTimes(initSpeed, endSpeed, distance);
         idealFinTimeResult = idealPeakTimeResults[1];
-        delta_v = endSpeed - initSpeed;
+        delta_v = initSpeed - endSpeed;
 
         evalBrake(distance, idealFinTimeResult, delta_v, arraysIndex, timeArray, acceleAzArray);//TODO Jerkで評価できるようにするもの．
 
@@ -222,9 +222,10 @@ public class Calclater {
 
     //
     public void onDestroy() {
-        mSoundPlayer.onDestroy();
+        if (mSoundPlayer != null) {
+            mSoundPlayer.onDestroy();
+        }
     }
-
 
 
 }

@@ -129,7 +129,6 @@ public class SceneAnalyzer {
 
             storeSensorValues(brakeStartTime, aZ); //時間とセンサー値を溜め込んでいく
 
-
             return ret;
 
         } else if (result == 2) {

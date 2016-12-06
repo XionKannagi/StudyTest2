@@ -231,7 +231,6 @@ public class DriveActivity extends Activity {
                 dist = 0;
             } else{
                 dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
-
             }
 
         } else {

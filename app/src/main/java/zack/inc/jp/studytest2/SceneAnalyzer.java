@@ -111,7 +111,7 @@ public class SceneAnalyzer {
             if (instate1 == false) {
                 //ブレーキ開始時刻，位置座標，速度を記録 return true
                 // 初めて3 -> 1変わった．
-                /**shokika**/
+                /**初期化**/
                 arraysIndex = 0;//Indexを0に戻す．
                 brakeStartTime = System.currentTimeMillis();//ブレーキ開始時刻
                 azMax = 0.0f;

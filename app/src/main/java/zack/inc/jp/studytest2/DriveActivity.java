@@ -139,7 +139,7 @@ public class DriveActivity extends Activity {
                     public void run() {
                         //handlerの関係で，この中での処理は避けるべき．
                         infoUpdate(); //<- 情報を更新
-                        //infoSave(); //<- 情報をLogに記録
+                        infoSave(); //<- 情報をLogに記録
                         judge(); //<-こいつを動かすと判定＋教示がされる
                         //TODO 更新，sampling を 25,50,100msに変更してみる
                         mHandler.postDelayed(this, SUMPLING_RATE);

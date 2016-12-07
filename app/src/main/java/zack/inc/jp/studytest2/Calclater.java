@@ -125,7 +125,10 @@ public class Calclater {
             mSoundPlayer.play(BREAK_PATTERN_GOOD);
 
         }
+
+        Log.i("caseSeparator", idealPeakTimeResult + " " + peakTime);
     }
+
 
     public void caseSeparatorV2(double initSpeed, double endSpeed, float distance, long peakTime, long finTime, float azMax, int arraysIndex, double[] timeArray, float[] acceleAzArray) {
 
@@ -138,7 +141,10 @@ public class Calclater {
         idealFinTimeResult = idealPeakTimeResults[1];
         delta_v = initSpeed - endSpeed;
 
-        evalBrake(distance, idealFinTimeResult, delta_v, arraysIndex, timeArray, acceleAzArray);//TODO Jerkで評価できるようにするもの．
+
+        if (arraysIndex != 0) {
+            evalBrake(distance, idealFinTimeResult, delta_v, arraysIndex, timeArray, acceleAzArray);//TODO Jerkで評価できるようにするもの．
+        }
 
     }
 
@@ -156,7 +162,7 @@ public class Calclater {
 
         b2 = (10 * (double) dist / Math.pow(idealFinTime, 3) - (6 * deltaV / Math.pow(idealFinTime, 2)));
 
-
+        Log.i("evalBrake", "Index:" + Index);
         for (int i = 0; i < Index; i++) {
             idealAcceleArray[i] = -((20 * b0 * Math.pow(timeArray[i], 3)) - (12 * b1 * Math.pow(timeArray[i], 2)) + 6 * b2 * timeArray[i]);
             if (i > 0) {
@@ -192,30 +198,55 @@ public class Calclater {
     //理想値でのピークの前後半で実測とのJerkの差を計算
     public void evalJerks(double[] idealJerk, double[] acceleAzJerk, int peakTimeIndex, int Index) {
 
-        double beforeSumValue = 0.0d;
-        double afterSumValue = 0.0d;
-        double beforeAverage;
-        double afterAverage;
-        int beforeCount = 0;
-        int afterCount = 0;
+        double beforePowerPlus = 0.0d;
+        double beforePowerMinus = 0.0d;
+        double afterPowerPlus = 0.0d;
+        double afterPowerMinus = 0.0d;
+        double beforePlusAverage;
+        double beforeMinusAverage;
+        double afterPlusAverage;
+        double afterMinusAverage;
+        int beforePlusCount = 0;
+        int beforeMinusCount = 0;
+        int afterPlusCount = 0;
+        int afterMinusCount = 0;
         TeachResult teachResult = new TeachResult(appContext);
 
         for (int i = 1; i <= peakTimeIndex; i++) {
-            beforeSumValue += idealJerk[i] - acceleAzJerk[i];//マイナス踏みすぎ
-            beforeCount++;
+
+            if ((idealJerk[i] - acceleAzJerk[i]) < 0) {//マイナス踏みすぎ
+                beforePowerMinus += Math.pow((idealJerk[i] - acceleAzJerk[i]), 2);
+                beforeMinusCount++;
+            } else {
+                beforePowerPlus += Math.pow((idealJerk[i] - acceleAzJerk[i]), 2);
+                beforePlusCount++;
+            }
+
+
         }
 
-        beforeAverage = beforeSumValue / beforeCount;
+        //こいつらの合計が0.4dを上回る時はスムーズじゃない
+        beforePlusAverage = beforePowerPlus / beforePlusCount;
+        beforeMinusAverage = beforePowerMinus / beforeMinusCount;
 
 
         for (int i = peakTimeIndex + 1; i < Index; i++) {
-            afterSumValue += idealJerk[i] - acceleAzJerk[i];//マイナス踏まなすぎ
-            afterCount++;
+            if ((idealJerk[i] - acceleAzJerk[i]) < 0) {//マイナス踏みすぎ
+                afterPowerMinus += Math.pow((idealJerk[i] - acceleAzJerk[i]), 2);
+                afterMinusCount++;
+            } else {
+                afterPowerPlus += Math.pow((idealJerk[i] - acceleAzJerk[i]), 2);
+                afterPlusCount++;
+            }
         }
 
-        afterAverage = afterSumValue / afterCount;
+        //こいつらの合計が0.4dを上回る時はスムーズじゃない
+        afterPlusAverage = afterPowerPlus / afterPlusCount;
+        afterMinusAverage = afterPowerMinus / afterMinusCount;
 
-        Toast.makeText(appContext, "beforeValue:" + beforeAverage + "afterValue:" + afterAverage, Toast.LENGTH_LONG).show();
+
+        Toast.makeText(appContext, "beforeValue:" + beforePlusAverage + "afterValue:" + beforeMinusAverage, Toast.LENGTH_LONG).show();
+        Log.i("calcなんたら", "beforeValue:" + beforePlusAverage + "afterValue:" + afterPlusAverage + "peakTimeIndex:" + peakTimeIndex);
         //TODO 教示部分を書く
 
     }

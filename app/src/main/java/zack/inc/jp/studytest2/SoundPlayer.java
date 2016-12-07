@@ -35,7 +35,8 @@ public class SoundPlayer {
 
     public void play(int pattern) {
 
-        voicePlayer[0].start();
+        voicePlayer[0].start();//Beep
+
         switch (pattern) {
             case 1:
                 voicePlayer[pattern].start();

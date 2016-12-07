@@ -46,11 +46,12 @@ public class Calclater {
         finTime = ((2 * (6 - Math.sqrt(6))) * distance) / (3 * (initSpeed - endSpeed));
 
         //理想的な減速終了時間を用いた減速度最大時刻
-        peakTime = (8 * p - 15 - Math.sqrt(19 * p * p - 75 * p + 75)) * finTime / (15 * (p - 2));
+        peakTime = (8 * p - 15 - Math.sqrt(19 * Math.pow(p, 2) - 75 * p + 75)) * finTime / (15 * (p - 2));
 
         results[0] = peakTime;
         results[1] = finTime;
 
+        Log.i("getIdealTime :", "Peak" + results[0] + "Fin" + results[1]);
 
         return results;
     }
@@ -126,7 +127,7 @@ public class Calclater {
 
         }
 
-        Log.i("caseSeparator", idealPeakTimeResult + " " + peakTime);
+        Log.i("caseSeparator", idealPeakTimeResult + " " + peakTime / 1000);
     }
 
 

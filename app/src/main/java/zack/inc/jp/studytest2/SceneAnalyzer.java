@@ -10,7 +10,7 @@ import android.util.Log;
 public class SceneAnalyzer {
 
 
-    static final int STORE_MAX = 5; //1sec
+    static final int STORE_MAX = 10; //1sec
     private float Ax[] = new float[STORE_MAX], Ay[] = new float[STORE_MAX], Az[] = new float[STORE_MAX];
     //TODO getArrayIndexをつかったほうがいい？
     private float accelecAzArray[] = new float[Define.SENSOR_STORE_MAX];//Max 50s
@@ -127,12 +127,14 @@ public class SceneAnalyzer {
                 azPeakTime = System.currentTimeMillis() - brakeStartTime;
             }
 
-            storeSensorValues(brakeStartTime, aZ); //時間とセンサー値を溜め込んでいく
-
+            if (arraysIndex < Define.SENSOR_STORE_MAX) {
+                storeSensorValues(brakeStartTime, aZ); //時間とセンサー値を溜め込んでいく
+            }
             return ret;
 
         } else if (result == 2) {
             if (instate1 == true) {
+                arraysIndex = 0;
                 instate1 = false;
                 instate2 = true;
                 return 2; // 状態1 直後の 状態2
@@ -151,7 +153,7 @@ public class SceneAnalyzer {
 
 
     public void storeSensorValues(long startTime, float aZ) {
-        Log.i("call storeSensorValues" ,"index" + arraysIndex);
+        //Log.i("call storeSensorValues" ,"index" + arraysIndex);
         accelecAzArray[arraysIndex] = aZ;
         timeArray[arraysIndex] = (System.currentTimeMillis() - startTime) / 1000; //(s)
 

@@ -63,6 +63,7 @@ public class SoundPlayer {
 
         if (voicePlayer != null) {
             if (voicePlayer[0].isPlaying()) {
+                //Stop all
                 playerStop();
             }
             //Release all

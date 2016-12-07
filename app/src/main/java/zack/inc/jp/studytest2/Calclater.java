@@ -29,6 +29,7 @@ public class Calclater {
 
     public Calclater(Context context) {
         this.appContext = context;
+        mSoundPlayer = new SoundPlayer(appContext);
     }
 
 
@@ -51,7 +52,7 @@ public class Calclater {
         results[0] = peakTime;
         results[1] = finTime;
 
-        Log.i("getIdealTime :", "Peak" + results[0] + "Fin" + results[1]);
+        Log.v("getIdealTime :", "Peak" + results[0] + "Fin" + results[1]);
 
         return results;
     }
@@ -93,7 +94,6 @@ public class Calclater {
         double idealPeakTimeResult;
         double idealFinTimeResult;
         TeachResult teachResult = new TeachResult(appContext);
-        mSoundPlayer = new SoundPlayer(appContext);
 
         idealPeakTimeResults = getIdealPeakTimes(initSpeed, endSpeed, distance);
         idealPeakTimeResult = idealPeakTimeResults[0];

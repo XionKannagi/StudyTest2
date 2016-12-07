@@ -73,7 +73,7 @@ public class SceneAnalyzer {
             }
         }
 
-        if ((max - min) < 0.04) {
+        if ((max - min) < 0.05) {
             return true;
         } else {
             return false;
@@ -106,7 +106,7 @@ public class SceneAnalyzer {
 
         result = judgeStatus();
         //ブレーキ中の挙動->加速度のピークとその時の時間を記録
-        if (result == 1) {
+        if (result == 1) { //BRAKE
             int ret = 0;
             if (instate1 == false) {
                 //ブレーキ開始時刻，位置座標，速度を記録 return true
@@ -122,7 +122,6 @@ public class SceneAnalyzer {
             }
 
             if (azMax < Az[p]) {
-                //TODO ピーク時の時刻も記録
                 azMax = Az[p];
                 azPeakTime = System.currentTimeMillis() - brakeStartTime;
             }
@@ -132,7 +131,7 @@ public class SceneAnalyzer {
             }
             return ret;
 
-        } else if (result == 2) {
+        } else if (result == 2) { // CRUISE
             if (instate1 == true) {
                 arraysIndex = 0;
                 instate1 = false;
@@ -141,7 +140,7 @@ public class SceneAnalyzer {
             }
             return 0;
 
-        } else if (result == 3) {
+        } else if (result == 3) { //STOP
             instate1 = false;
             instate2 = false;
             return 0;
@@ -181,16 +180,10 @@ public class SceneAnalyzer {
 
 
     //加速度のピーク値
-    public float getAzMax() {
-        //ピーク値
-        return azMax;
-    }
+    public float getAzMax() {return azMax;}
 
     //加速度ピーク時の時刻
-    public long getPeakTime() {
-        //ピーク時刻
-        return azPeakTime;
-    }
+    public long getPeakTime() {return azPeakTime;}
 
 
 }

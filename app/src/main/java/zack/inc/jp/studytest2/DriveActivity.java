@@ -99,7 +99,7 @@ public class DriveActivity extends Activity {
         mActionBar = getActionBar();
         mActionBar.setTitle("Measuring");
 
-        logModeText =  (TextView)findViewById(R.id.logModeText);
+        logModeText = (TextView) findViewById(R.id.logModeText);
         logModeText.setText("Logging OFF");
         logModeText.setTextColor(Color.RED);
 
@@ -198,11 +198,9 @@ public class DriveActivity extends Activity {
     }
 
 
-
-
     //計測データの記録
     public void infoSave() {
-        if(logModeFlag) {
+        if (logModeFlag) {
             DL.saveLog(System.currentTimeMillis(), A[0], A[1], A[2], mLatitude, mLongitude, mSpeed);//記録
         }
     }
@@ -221,16 +219,20 @@ public class DriveActivity extends Activity {
             } else if (flag == 2) {
                 Log.v("judge", "ブレーキ終わり");
                 setEndInfo();
-                //理想のピーク時刻を取得するメソッドに，上の情報を投げる
-                mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime,finTime, azMax);
-                //mCalc.caseSeparatorV2(startSpeed,endSpeed,dist,azPeakTime,finTime,azMax,mSA.getArraysIndex(),mSA.getTimeArray(),mSA.getAzArray());//TODO ここを動かすとv２が動きます
-
+                if (mSA.getArraysIndex() > 10) { //3s以下は誤差大きそうなので弾く
+                    //理想のピーク時刻を取得するメソッドに，上の情報を投げる
+                    mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, finTime, azMax);
+                    //mCalc.caseSeparatorV2(startSpeed,endSpeed,dist,azPeakTime,finTime,azMax,mSA.getArraysIndex(),mSA.getTimeArray(),mSA.getAzArray());//TODO ここを動かすとv２が動きます
+                    Log.v("Index :"," "+mSA.getArraysIndex());
+                    Log.v("start speed :", " " + startSpeed);
+                }
                 stateCount = 0;
             }
             if (flag == 1) {
                 dist = 0;
-            } else{
+            } else {
                 dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
+                Log.v("Distance :", "" + dist);
             }
 
         } else {
@@ -266,10 +268,10 @@ public class DriveActivity extends Activity {
 
     }
 
-    public void onLogSwitchChecked(View v){
+    public void onLogSwitchChecked(View v) {
         logModeSwitch = (Switch) v;
 
-        if(logModeSwitch.isChecked()){
+        if (logModeSwitch.isChecked()) {
             logModeFlag = true;
             logModeText.setText("Logging ON");
             logModeText.setTextColor(getResources().getColor(R.color.LogModeTextColor));
@@ -288,7 +290,7 @@ public class DriveActivity extends Activity {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         mCalc.onDestroy();
     }

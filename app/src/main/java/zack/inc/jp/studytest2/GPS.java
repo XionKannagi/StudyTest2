@@ -40,7 +40,7 @@ public class GPS implements LocationListener {
         location = locman.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
 
-        //TODO 初期値に前回のデータが残っている
+
         if (location != null) {
             latitude = location.getLatitude();
             longitude = location.getLongitude();
@@ -48,14 +48,6 @@ public class GPS implements LocationListener {
         }
 
 
-        /*
-        //GPSのオプション
-        Criteria criteria = new Criteria();
-
-        criteria.setAccuracy(Criteria.ACCURACY_HIGH);//取得制度
-        criteria.setSpeedRequired(true);//速度情報の取得を要求
-        criteria.setSpeedAccuracy(Criteria.ACCURACY_HIGH);//速度制度
-        */
     }
 
     public void onResume() {

@@ -12,7 +12,7 @@ public class SceneAnalyzer {
 
     static final int STORE_MAX = 10; //1sec
     private float Ax[] = new float[STORE_MAX], Ay[] = new float[STORE_MAX], Az[] = new float[STORE_MAX];
-    //TODO getArrayIndexをつかったほうがいい？
+
     private float accelecAzArray[] = new float[Define.SENSOR_STORE_MAX];//Max 50s
     private double timeArray[] = new double[Define.SENSOR_STORE_MAX];//Max 50s
     private int arraysIndex = 0;
@@ -29,7 +29,7 @@ public class SceneAnalyzer {
 
 
         //シーン判定改良版
-        //TODO 閾値の部分の調整 -> 速度&加速度での閾値を見るべきかもしてない
+
         //Log.v("judgeState", Integer.toString(state));
         switch (state) {
             case 0://STOP
@@ -41,7 +41,6 @@ public class SceneAnalyzer {
                 else if (Az[p] > 0.5) state = 2;
                 return 3;
             case 2://BRAKE
-                //TODO CRUISE状態に戻るときの条件
 
                 /*** 窓を見る ***/
                 // 最大最小とる

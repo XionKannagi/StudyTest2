@@ -24,6 +24,9 @@ public class Calclater {
     private static int BREAK_PATTERN_BACK_PEAK_2 = 4;//理想に対して少し遅い
     private static int BRAKE_PATTERN_SUDDEN = 5;// 急ブレーキ
     private static int BREAK_PATTERN_GOOD = 6;//いいブレーキ
+    private static int BREAK_PATTERN_GOOD_BAD_BEFORE = 7;
+    private static int BREAK_PATTERN_GOOD_BAD_AFTER = 8;
+    private static int BREAK_PATTERN_GOOD_BAD_NO_FIT = 9;
     private double goodTimeRange = 0.3; //理想的なプレーキ時間±0.3sの範囲はgoodブレーキ
     private double badTimeRange = goodTimeRange * 2;
 
@@ -157,7 +160,7 @@ public class Calclater {
         double idealAcceleArray[] = new double[Index];
         int peakTimeIndex = 0;
 
-
+        /**係数たち**/
         b0 = (6 * (double) dist / Math.pow(idealFinTime, 5) - (3 * deltaV / Math.pow(idealFinTime, 4)));
 
         b1 = (15 * (double) dist / Math.pow(idealFinTime, 4) - (8 * deltaV / Math.pow(idealFinTime, 3)));
@@ -208,11 +211,12 @@ public class Calclater {
         double beforeMinusAverage;
         double afterPlusAverage;
         double afterMinusAverage;
+        double beforeValue;
+        double afterValue;
         int beforePlusCount = 0;
         int beforeMinusCount = 0;
         int afterPlusCount = 0;
         int afterMinusCount = 0;
-        TeachResult teachResult = new TeachResult(appContext);
 
         for (int i = 1; i <= peakTimeIndex; i++) {
 
@@ -230,6 +234,7 @@ public class Calclater {
         //こいつらの合計が0.4dを上回る時はスムーズじゃない
         beforePlusAverage = beforePowerPlus / beforePlusCount;
         beforeMinusAverage = beforePowerMinus / beforeMinusCount;
+        beforeValue = beforePlusAverage + beforeMinusAverage;
 
 
         for (int i = peakTimeIndex + 1; i < Index; i++) {
@@ -245,12 +250,27 @@ public class Calclater {
         //こいつらの合計が0.4dを上回る時はスムーズじゃない
         afterPlusAverage = afterPowerPlus / afterPlusCount;
         afterMinusAverage = afterPowerMinus / afterMinusCount;
+        afterValue = afterPlusAverage + afterMinusCount;
 
 
         Toast.makeText(appContext, "beforeValue:" + beforePlusAverage + "afterValue:" + beforeMinusAverage, Toast.LENGTH_LONG).show();
         Log.i("calcなんたら", "beforeValue:" + beforePlusAverage + "afterValue:" + afterPlusAverage + "peakTimeIndex:" + peakTimeIndex);
-        //TODO 教示部分を書く
 
+        /*
+        if(beforeValue < 0.4 && afterValue<0.4){
+            teachResult.teaching(BREAK_PATTERN_GOOD);
+            mSoundPlayer.play(BREAK_PATTERN_GOOD);
+        }else if(beforeValue <= 0.4 && afterValue < 0.4){
+            teachResult.teaching(BREAK_PATTERN_GOOD_BAD_BEFORE);
+            mSoundPlayer.play(BREAK_PATTERN_GOOD_BAD_BEFORE);
+        } else if (beforeValue < 0.4 && afterValue >= 0.4){
+            teachResult.teaching(BREAK_PATTERN_GOOD_BAD_AFTER);
+            mSoundPlayer.play(BREAK_PATTERN_GOOD_BAD_AFTER);
+        } else {
+            teachResult.teaching(BREAK_PATTERN_GOOD_BAD_NO_FIT);
+            mSoundPlayer.play(BREAK_PATTERN_GOOD_BAD_NO_FIT);
+        }
+        */
     }
 
     //

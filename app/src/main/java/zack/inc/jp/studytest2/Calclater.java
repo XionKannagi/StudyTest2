@@ -16,6 +16,7 @@ public class Calclater {
     private double finTime;
     private double peakTime;
     private Context appContext;
+    private TeachResult teachResult;
     private SoundPlayer mSoundPlayer;
     private static int BRAKE_PATTERN_FRONT_PEAK_1 = 1;//理想に対してだいぶ早い
     private static int BRAKE_PATTERN_FRONT_PEAK_2 = 2;//理想に対してすこし早い
@@ -29,6 +30,7 @@ public class Calclater {
 
     public Calclater(Context context) {
         this.appContext = context;
+        teachResult = new TeachResult(appContext);
         mSoundPlayer = new SoundPlayer(appContext);
     }
 
@@ -93,7 +95,6 @@ public class Calclater {
         double[] idealPeakTimeResults;
         double idealPeakTimeResult;
         double idealFinTimeResult;
-        TeachResult teachResult = new TeachResult(appContext);
 
         idealPeakTimeResults = getIdealPeakTimes(initSpeed, endSpeed, distance);
         idealPeakTimeResult = idealPeakTimeResults[0];

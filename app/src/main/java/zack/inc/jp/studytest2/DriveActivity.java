@@ -104,7 +104,7 @@ public class DriveActivity extends Activity {
         logModeText.setTextColor(Color.RED);
 
         driverNameText.setText(driverName);
-        infoUpdate();
+        //infoUpdate();
 
     }
 
@@ -219,25 +219,27 @@ public class DriveActivity extends Activity {
             } else if (flag == 2) {
                 Log.v("judge", "ブレーキ終わり");
                 setEndInfo();
-                if (mSA.getArraysIndex() > 10) { //3s以下は誤差大きそうなので弾く
-                    //理想のピーク時刻を取得するメソッドに，上の情報を投げる
-                    mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, finTime, azMax);
-                    //mCalc.caseSeparatorV2(startSpeed,endSpeed,dist,azPeakTime,finTime,azMax,mSA.getArraysIndex(),mSA.getTimeArray(),mSA.getAzArray());//TODO ここを動かすとv２が動きます
-                    Log.v("Index :"," "+mSA.getArraysIndex());
-                    Log.v("start speed :", " " + startSpeed);
-                }
+                //理想のピーク時刻を取得するメソッドに，上の情報を投げる
+                mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, finTime, azMax);
+                //mCalc.caseSeparatorV2(startSpeed,endSpeed,dist,azPeakTime,finTime,azMax,mSA.getArraysIndex(),mSA.getTimeArray(),mSA.getAzArray());//TODO ここを動かすとv２が動きます
+                Log.i("Index :", " " + mSA.getArraysIndex());
+                Log.i("start speed :", " " + startSpeed);
+
                 stateCount = 0;
             }
-            if (flag == 1) {
-                dist = 0;
+
+            if (oldLocation != null) {
+                if (flag == 1) {
+                    dist = 0;
+                } else {
+                    dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
+                    Log.v("Distance :", "" + dist);
+                }
+
             } else {
-                dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
-                Log.v("Distance :", "" + dist);
+                //なにもしない
+
             }
-
-        } else {
-            //なにもしない
-
         }
 
 

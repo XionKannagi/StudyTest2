@@ -126,9 +126,8 @@ public class SceneAnalyzer {
                 azPeakTime = System.currentTimeMillis() - brakeStartTime;
             }
 
-            if (arraysIndex < Define.SENSOR_STORE_MAX) {
+            if (arraysIndex > Define.SENSOR_STORE_MAX) arraysIndex = 0;
                 storeSensorValues(brakeStartTime, aZ); //時間とセンサー値を溜め込んでいく
-            }
             return ret;
 
         } else if (result == 2) { // CRUISE
@@ -180,10 +179,14 @@ public class SceneAnalyzer {
 
 
     //加速度のピーク値
-    public float getAzMax() {return azMax;}
+    public float getAzMax() {
+        return azMax;
+    }
 
     //加速度ピーク時の時刻
-    public long getPeakTime() {return azPeakTime;}
+    public long getPeakTime() {
+        return azPeakTime;
+    }
 
 
 }

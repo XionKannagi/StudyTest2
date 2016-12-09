@@ -27,6 +27,7 @@ public class DataLogger {
     private String saveTime;
     private long initTime;
     private Context appContext;
+    private String filePathStr;
     private String sysMode;
 
 
@@ -37,11 +38,15 @@ public class DataLogger {
         this.saveTime = timeStamp;
         this.appContext = context;
 
+        String exPathStr = appContext.getExternalFilesDir(null).getPath();// /root/sdcard/Android/data/package_name/filesを取得
+
         if(modeFlag){
             this.sysMode = "_on";//教示モードのとき
         } else {
             this.sysMode = "_off";//計測モードのとき
         }
+
+        filePathStr = exPathStr + "/" + saveTime + "_" + driverName + sysMode + ".csv";
 
     }
 
@@ -49,9 +54,9 @@ public class DataLogger {
     public void saveLog(long time, float Ax, float Ay, float Az, double latitude, double longitude, double speed) {
         FileOutputStream fos;
         BufferedWriter bw = null;
-        String exPathStr = appContext.getExternalFilesDir(null).getPath();// /root/sdcard/Android/data/package_name/filesを取得
+
         try {
-            fos = new FileOutputStream(exPathStr + "/" + saveTime + "_" + driverName + sysMode + ".csv", true);// /root/sdcard/Android/data/package_name/files/直下に記録
+            fos = new FileOutputStream(filePathStr, true);// /root/sdcard/Android/data/package_name/files/直下に記録
             bw = new BufferedWriter(new OutputStreamWriter(fos));
             StringBuilder sb = new StringBuilder();
             //Logに必要なデータを詰めていく

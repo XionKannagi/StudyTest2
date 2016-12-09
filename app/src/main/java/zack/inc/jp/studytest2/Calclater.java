@@ -103,6 +103,8 @@ public class Calclater {
         idealPeakTimeResult = idealPeakTimeResults[0];
         idealFinTimeResult = idealPeakTimeResults[1];
 
+        goodTimeRange = idealFinTimeResult / 30; //全体の時間のうち±1/30のピーク時間誤差を許容
+        badTimeRange = goodTimeRange * 2;
 
         //TODO finTimeの情報を入れるといいかも
         //教示用のメソッドに投げる
@@ -131,7 +133,7 @@ public class Calclater {
 
         }
 
-        Log.i("caseSeparator", idealPeakTimeResult + " " + peakTime / 1000);
+        Log.i("caseSeparator", idealPeakTimeResult + " " + (double) peakTime / 1000);
     }
 
 
@@ -255,6 +257,8 @@ public class Calclater {
 
         Toast.makeText(appContext, "beforeValue:" + beforePlusAverage + "afterValue:" + beforeMinusAverage, Toast.LENGTH_LONG).show();
         Log.i("calcなんたら", "beforeValue:" + beforePlusAverage + "afterValue:" + afterPlusAverage + "peakTimeIndex:" + peakTimeIndex);
+
+        //TODO ここがv2の教示部分
 
         /*
         if(beforeValue < 0.4 && afterValue<0.4){

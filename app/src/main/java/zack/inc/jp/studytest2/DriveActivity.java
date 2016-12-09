@@ -132,6 +132,7 @@ public class DriveActivity extends Activity {
             buttonFlag = false;
             strStpButton.setText("Stop!");
             if (GPS.Inst().getLocation() != null) {
+
                 DL = new DataLogger(this, System.currentTimeMillis(), df.format(new Date()), driverName, modeFlag);
                 Log.d("Timer:", "Start");
                 mHandler.postDelayed(new Runnable() {
@@ -141,7 +142,7 @@ public class DriveActivity extends Activity {
                         infoUpdate(); //<- 情報を更新
                         infoSave(); //<- 情報をLogに記録
                         judge(); //<-こいつを動かすと判定＋教示がされる
-                        //TODO 更新，sampling を 25,50,100msに変更してみる
+                        //TODO 更新，sampling 100msに変更してみる
                         mHandler.postDelayed(this, SUMPLING_RATE);
                     }
                 }, SUMPLING_RATE); //<- 0.1sごとに情報更新
@@ -220,8 +221,8 @@ public class DriveActivity extends Activity {
                 Log.v("judge", "ブレーキ終わり");
                 setEndInfo();
                 //理想のピーク時刻を取得するメソッドに，上の情報を投げる
-                mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, finTime, azMax);
-                //mCalc.caseSeparatorV2(startSpeed,endSpeed,dist,azPeakTime,finTime,azMax,mSA.getArraysIndex(),mSA.getTimeArray(),mSA.getAzArray());//TODO ここを動かすとv２が動きます
+                //mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, finTime, azMax);
+                mCalc.caseSeparatorV2(startSpeed,endSpeed,dist,azPeakTime,finTime,azMax,mSA.getArraysIndex(),mSA.getTimeArray(),mSA.getAzArray());//TODO ここを動かすとv２が動きます
                 Log.i("Index :", " " + mSA.getArraysIndex());
                 Log.i("start speed :", " " + startSpeed);
 

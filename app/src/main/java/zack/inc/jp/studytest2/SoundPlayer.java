@@ -53,7 +53,6 @@ public class SoundPlayer {
             voicePlayer[i] = MediaPlayer.create(context, soundResource[i]);
         }
 
-
     }
 
     public void play(int pattern) {

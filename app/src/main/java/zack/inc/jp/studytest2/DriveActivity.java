@@ -142,7 +142,6 @@ public class DriveActivity extends Activity {
                         infoUpdate(); //<- 情報を更新
                         infoSave(); //<- 情報をLogに記録
                         judge(); //<-こいつを動かすと判定＋教示がされる
-                        //TODO 更新，sampling 100msに変更してみる
                         mHandler.postDelayed(this, SUMPLING_RATE);
                     }
                 }, SUMPLING_RATE); //<- 0.1sごとに情報更新
@@ -192,7 +191,6 @@ public class DriveActivity extends Activity {
         endSpeed = mSpeed;
         finTime = System.currentTimeMillis() - startTime;//ブレーキ終了時刻
         azMax = mSA.getAzMax();
-        //TODO もしかすると，Calclaterクラスで計算させたほうがいいかもしれない．
         azPeakTime = mSA.getPeakTime(); // msで取得されている
 
 
@@ -221,10 +219,12 @@ public class DriveActivity extends Activity {
                 Log.v("judge", "ブレーキ終わり");
                 setEndInfo();
                 //理想のピーク時刻を取得するメソッドに，上の情報を投げる
-                //mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, finTime, azMax);
-                mCalc.caseSeparatorV2(startSpeed,endSpeed,dist,azPeakTime,finTime,azMax,mSA.getArraysIndex(),mSA.getTimeArray(),mSA.getAzArray());//TODO ここを動かすとv２が動きます
-                Log.i("Index :", " " + mSA.getArraysIndex());
-                Log.i("start speed :", " " + startSpeed);
+                if (mSA.getArraysIndex() > 0) {
+                    //mCalc.caseSeparator(startSpeed, endSpeed, dist, azPeakTime, finTime, azMax);
+                    mCalc.caseSeparatorV2(startSpeed, endSpeed, dist, azPeakTime, finTime, azMax, mSA.getArraysIndex(), mSA.getTimeArray(), mSA.getAzArray());//TODO ここを動かすとv２が動きます
+                    Log.i("Index ", " " + mSA.getArraysIndex());
+                    //Log.i("start speed :", " " + startSpeed);
+                }
 
                 stateCount = 0;
             }
@@ -234,7 +234,7 @@ public class DriveActivity extends Activity {
                     dist = 0;
                 } else {
                     dist += mCalc.getDistance(oldLocation.getLatitude(), oldLocation.getLongitude(), mLatitude, mLongitude);
-                    Log.v("Distance :", "" + dist);
+                    //Log.v("Distance :", "" + dist);
                 }
 
             } else {

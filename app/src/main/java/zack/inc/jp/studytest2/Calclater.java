@@ -140,18 +140,53 @@ public class Calclater {
     public void caseSeparatorV2(double initSpeed, double endSpeed, float distance, long peakTime, long finTime, float azMax, int arraysIndex, double[] timeArray, float[] acceleAzArray) {
 
         double[] idealPeakTimeResults;
+        double idealPeakTimeResult;
         double idealFinTimeResult;
         double delta_v;
 
 
         idealPeakTimeResults = getIdealPeakTimes(initSpeed, endSpeed, distance);
+        idealPeakTimeResult = idealPeakTimeResults[0];
         idealFinTimeResult = idealPeakTimeResults[1];
         delta_v = initSpeed - endSpeed;
 
+        goodTimeRange = idealFinTimeResult / 30; //全体の時間のうち±1/30のピーク時間誤差を許容
+        badTimeRange = goodTimeRange * 2;
 
-        if (arraysIndex != 0) {
+        //TODO finTimeの情報を入れるといいかも
+        //教示用のメソッドに投げる
+        if (azMax > 2.94) {
+            teachResult.teaching(BRAKE_PATTERN_SUDDEN);//加速度のピークが2.94を超えていたら急ブレーキ
+            mSoundPlayer.play(BRAKE_PATTERN_SUDDEN);
+        } else if ((idealPeakTimeResult - goodTimeRange) > ((double) peakTime) / 1000) {//理想よりも手前ピークのとき
+            if ((idealPeakTimeResult - (goodTimeRange + badTimeRange)) > ((double) peakTime) / 1000) {
+                teachResult.teaching(BRAKE_PATTERN_FRONT_PEAK_1);
+                mSoundPlayer.play(BRAKE_PATTERN_FRONT_PEAK_1);
+            } else {
+                teachResult.teaching(BRAKE_PATTERN_FRONT_PEAK_2);
+                mSoundPlayer.play(BRAKE_PATTERN_FRONT_PEAK_2);
+            }
+        } else if ((idealPeakTimeResult + goodTimeRange) < ((double) peakTime) / 1000) {//理想よりも奥ピークのとき
+            if ((idealPeakTimeResult + (goodTimeRange + badTimeRange)) < ((double) peakTime) / 1000) {
+                teachResult.teaching(BREAK_PATTERN_BACK_PEAK_1);
+                mSoundPlayer.play(BREAK_PATTERN_BACK_PEAK_1);
+            } else {
+                teachResult.teaching(BREAK_PATTERN_BACK_PEAK_2);
+                mSoundPlayer.play(BREAK_PATTERN_BACK_PEAK_2);
+            }
+        } else { //それ以外はおそらく良いブレーキ
+
+            /**タイミングがよかったらグラフと比較**/
             evalBrake(distance, idealFinTimeResult, delta_v, arraysIndex, timeArray, acceleAzArray);//TODO Jerkで評価できるようにするもの．
+
         }
+
+        Log.i("caseSeparator", idealPeakTimeResult + " " + (double) peakTime / 1000);
+
+
+
+
+
 
     }
 
@@ -256,15 +291,15 @@ public class Calclater {
 
 
         Toast.makeText(appContext, "beforeValue:" + beforePlusAverage + "afterValue:" + beforeMinusAverage, Toast.LENGTH_LONG).show();
-        Log.i("calcなんたら", "beforeValue:" + beforePlusAverage + "afterValue:" + afterPlusAverage + "peakTimeIndex:" + peakTimeIndex);
+        Log.d("calcなんたら", "beforeValue:" + beforePlusAverage + "afterValue:" + afterPlusAverage + "peakTimeIndex:" + peakTimeIndex);
 
         //TODO ここがv2の教示部分
 
-        /*
+
         if(beforeValue < 0.4 && afterValue<0.4){
             teachResult.teaching(BREAK_PATTERN_GOOD);
             mSoundPlayer.play(BREAK_PATTERN_GOOD);
-        }else if(beforeValue <= 0.4 && afterValue < 0.4){
+        }else if(beforeValue >= 0.4 && afterValue < 0.4){
             teachResult.teaching(BREAK_PATTERN_GOOD_BAD_BEFORE);
             mSoundPlayer.play(BREAK_PATTERN_GOOD_BAD_BEFORE);
         } else if (beforeValue < 0.4 && afterValue >= 0.4){
@@ -274,7 +309,7 @@ public class Calclater {
             teachResult.teaching(BREAK_PATTERN_GOOD_BAD_NO_FIT);
             mSoundPlayer.play(BREAK_PATTERN_GOOD_BAD_NO_FIT);
         }
-        */
+
     }
 
     //

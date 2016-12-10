@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class DriveActivity extends AppCompatActivity {
+public class DriveActivity extends Activity {
 
     TextView speedText;
     TextView xAccelText;

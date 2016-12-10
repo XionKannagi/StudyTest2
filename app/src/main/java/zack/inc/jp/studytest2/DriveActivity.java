@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Handler;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +21,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class DriveActivity extends Activity {
+public class DriveActivity extends AppCompatActivity {
 
     TextView speedText;
     TextView xAccelText;

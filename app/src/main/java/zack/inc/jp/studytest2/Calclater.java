@@ -291,10 +291,9 @@ public class Calclater {
 
 
         Toast.makeText(appContext, "beforeValue:" + beforePlusAverage + "afterValue:" + beforeMinusAverage, Toast.LENGTH_LONG).show();
-        Log.d("calcなんたら", "beforeValue:" + beforePlusAverage + "afterValue:" + afterPlusAverage + "peakTimeIndex:" + peakTimeIndex);
+        Log.d("calcなんたら", "beforeValue:" + beforeValue + " afterValue: " + afterValue + " peakTimeIndex: " + peakTimeIndex);
 
         //TODO ここがv2の教示部分
-
 
         if(beforeValue < 0.4 && afterValue<0.4){
             teachResult.teaching(BREAK_PATTERN_GOOD);

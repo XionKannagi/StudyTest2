@@ -63,7 +63,7 @@ public class DriveActivity extends Activity {
     private boolean modeFlag; //教示モード <-> 計測モード 切り替えよう
     private boolean logModeFlag;
     private Handler mHandler = new Handler();
-    private static int SUMPLING_RATE = 100;//ms
+    private static int SAMPLING_RATE = 100;//ms
 
 
     @Override
@@ -143,9 +143,9 @@ public class DriveActivity extends Activity {
                         infoUpdate(); //<- 情報を更新
                         infoSave(); //<- 情報をLogに記録
                         judge(); //<-こいつを動かすと判定＋教示がされる
-                        mHandler.postDelayed(this, SUMPLING_RATE);
+                        mHandler.postDelayed(this, SAMPLING_RATE);
                     }
-                }, SUMPLING_RATE); //<- 0.1sごとに情報更新
+                }, SAMPLING_RATE); //<- 0.1sごとに情報更新
             } else {
                 Log.d("GPS", "Location not found");
                 Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
